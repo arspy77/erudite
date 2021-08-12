@@ -50,7 +50,7 @@ spec:
   tolerations:
   - key: "CriticalAddonsOnly"
     operator: "Exists"
-  - key: "role"
+  - key: "node-role.kubernetes.io/master"
     operator: "Exists"
     effect: "NoSchedule"
   affinity:
@@ -58,11 +58,10 @@ spec:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          - key: "role"
-            operator: In
-            values: ["master"]
+          - key: "node-role.kubernetes.io/master"
+            operator: Exists
   restartPolicy: Always
   containers:
   - name: dragon-tf-operator
-    image: gcr.io/dynamic-resource-scheduler-1/dragon
+    image: gcr.io/genial-analyzer-322702/tf-operator-dragon
     command: ["DRAGON", "-alsologtostderr"]
