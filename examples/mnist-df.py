@@ -68,8 +68,10 @@ def main(_):
       while not mon_sess.should_stop():
         batch_xs, batch_ys = mnist.train.next_batch(16)
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
-        test_accuracy = mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
-        ncorrect = mon_sess.run(number_of_correct, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
+        if not mon_sess.should_stop():
+          test_accuracy = mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
+        if not mon_sess.should_stop():
+          ncorrect = mon_sess.run(number_of_correct, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
         if step % 1000 == 0:
           print('global_step: '+str(step) + "\n")
       print("Number of Correct Test: %d" % ncorrect)
