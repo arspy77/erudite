@@ -70,8 +70,8 @@ def main(_):
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
         test_accuracy = mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
         ncorrect = mon_sess.run(ncorrect, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
-        #sys.stderr.write('global_step: '+str(step))
-        #sys.stderr.write('\n')
+        if step % 1000 == 0:
+          print('global_step: '+str(step) + "\n")
       print("Number of Correct Test: %d" % ncorrect)
       print("Test-Accuracy: %2.10f" % test_accuracy)
       print("Total Time: %3.10fs" % float(time.time() - begin_time))
