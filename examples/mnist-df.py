@@ -55,6 +55,7 @@ def main(_):
     # restoring from a checkpoint, saving to a checkpoint, and closing when done
     # or an error occurs.
     begin_time = time.time()
+    accuracy = 0
     with tf.train.MonitoredTrainingSession(master=server.target,
                                            is_chief=(FLAGS.task_index == 0),
                                            config=tf.ConfigProto(
@@ -65,10 +66,11 @@ def main(_):
       while not mon_sess.should_stop():
         batch_xs, batch_ys = mnist.train.next_batch(16)
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
-        print("Test-Accuracy: %2.2f" % mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+        accuracy = mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
         #sys.stderr.write('global_step: '+str(step))
         #sys.stderr.write('\n')
-      print("Total Time: %3.2fs" % float(time.time() - begin_time))
+      print("Test-Accuracy: %2.10f" % accuracy)
+      print("Total Time: %3.10fs" % float(time.time() - begin_time))
 
 
 if __name__ == "__main__":
