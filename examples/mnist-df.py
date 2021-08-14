@@ -2,6 +2,7 @@ import argparse
 import sys
 import os
 import ast
+import time
 
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
@@ -38,19 +39,22 @@ def main(_):
       x = tf.placeholder(tf.float32, [None, 784])
       W = tf.Variable(tf.zeros([784, 10]))
       b = tf.Variable(tf.zeros([10]))
-      y = tf.nn.softmax(tf.matmul(x, W) + b)
+      y = tf.nn.softmax(tf.matmul(x, W) + b) #logit score matrix
       y_ = tf.placeholder(tf.float32, [None, 10])
       cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
       learning_rate = 0.05
       global_step = tf.train.get_or_create_global_step()
       train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy, global_step=global_step)
-
+      correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
+      accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+ 
     # The StopAtStepHook handles stopping after running given steps.
     hooks=[tf.train.StopAtStepHook(last_step=FLAGS.global_steps)]
 
     # The MonitoredTrainingSession takes care of session initialization,
     # restoring from a checkpoint, saving to a checkpoint, and closing when done
     # or an error occurs.
+    begin_time = time.time()
     with tf.train.MonitoredTrainingSession(master=server.target,
                                            is_chief=(FLAGS.task_index == 0),
                                            config=tf.ConfigProto(
@@ -63,6 +67,9 @@ def main(_):
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
         #sys.stderr.write('global_step: '+str(step))
         #sys.stderr.write('\n')
+      
+      print("Test-Accuracy: %2.2f" % mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+      print("Total Time: %3.2fs" % float(time.time() - begin_time))
 
 
 if __name__ == "__main__":
@@ -72,5 +79,4 @@ if __name__ == "__main__":
   FLAGS.ps_hosts = ",".join(TF_CONFIG["cluster"]["ps"])
   FLAGS.worker_hosts = ",".join(TF_CONFIG["cluster"]["worker"])
   FLAGS.global_steps = int(os.environ["global_steps"]) if "global_steps" in os.environ else 100000
-  tf.app.run(main=main, argv=[sys.argv[0]])
-  
+  tf.app.run(main=main, argv=[sys.argv[0]]) 
