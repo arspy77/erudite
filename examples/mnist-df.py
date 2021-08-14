@@ -65,10 +65,9 @@ def main(_):
       while not mon_sess.should_stop():
         batch_xs, batch_ys = mnist.train.next_batch(16)
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
+        print("Test-Accuracy: %2.2f" % mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
         #sys.stderr.write('global_step: '+str(step))
         #sys.stderr.write('\n')
-      
-      print("Test-Accuracy: %2.2f" % mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
       print("Total Time: %3.2fs" % float(time.time() - begin_time))
 
 
