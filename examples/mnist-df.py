@@ -46,6 +46,7 @@ def main(_):
       global_step = tf.train.get_or_create_global_step()
       train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy, global_step=global_step)
       correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
+      number_of_correct = tf.reduce_sum(tf.cast(correct_prediction, tf.int32))
       accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
  
     # The StopAtStepHook handles stopping after running given steps.
@@ -56,6 +57,7 @@ def main(_):
     # or an error occurs.
     begin_time = time.time()
     test_accuracy = 0
+    ncorrect = 0
     with tf.train.MonitoredTrainingSession(master=server.target,
                                            is_chief=(FLAGS.task_index == 0),
                                            config=tf.ConfigProto(
@@ -67,8 +69,10 @@ def main(_):
         batch_xs, batch_ys = mnist.train.next_batch(16)
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
         test_accuracy = mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
+        ncorrect = mon_sess.run(ncorrect, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
         #sys.stderr.write('global_step: '+str(step))
         #sys.stderr.write('\n')
+      print("Number of Correct Test: %d" % ncorrect)
       print("Test-Accuracy: %2.10f" % test_accuracy)
       print("Total Time: %3.10fs" % float(time.time() - begin_time))
 
