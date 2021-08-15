@@ -3,8 +3,8 @@ kind: TFJob
 metadata:
   name: job2
 spec:
-  max-instances: 6
-  min-instances: 2
+  max-instances: 4
+  min-instances: 1
   priority: 1
   cleanPodPolicy: "All"
   tfReplicaSpecs:
@@ -16,7 +16,7 @@ spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://lsalab.cs.nthu.edu.tw/~ericyeh/DRAGON/mnist-df.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df.py | python3 -'
             command:
             - /bin/bash
             - -c
@@ -33,10 +33,12 @@ spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://lsalab.cs.nthu.edu.tw/~ericyeh/DRAGON/mnist-df.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df.py | python3 -'
             env:
             - name: global_steps
               value: "100000"
+            - name: use_salr
+              value: False
             command:
             - /bin/bash
             - -c
