@@ -60,7 +60,39 @@ def main(_):
 
       # For SALR algorithm
       stochastic_sharpness_list = tf.Variable([])
+      new_stochastic_sharpness = tf.placeholder(tf.float32, shape=[], name="new_stochastic_sharpness")
+      concat_to_stochastic_sharpness_list = tf.concat(stochastic_sharpness_list, new_stochastic_sharpness)
       
+      base_learning_rate = 0.05
+      n_ascent = 5
+      n_descent = 5
+      freq = 20
+
+      x_ascent = tf.placeholder(tf.float32, [None, 784])
+      W_ascent = tf.Variable(tf.zeros([784, 10]))
+      assign_W_ascent = W_ascent.assign(W)
+      b_ascent = tf.Variable(tf.zeros([10]))
+      assign_b_ascent = b_ascent.assign(b)
+      y_ascent = tf.nn.softmax(tf.matmul(x_ascent, W_ascent) + b_ascent)
+      y__ascent = tf.placeholder(tf.float32, [None, 10])
+      cross_entropy_ascent = tf.reduce_mean(-tf.reduce_sum(y__ascent * tf.log(y_ascent), reduction_indices=[1]))
+      
+      gradients_ascent = tf.gradients(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES), cross_entropy_ascent)
+      grads_and_vars_ascent = [(tf.clip_by_norm(grad, 1), var)  for grad, var in gradients_ascent]
+      train_op_ascent = tf.train.GradientDescentOptimizer(learning_rate=-base_learning_rate).apply_gradients(grads_and_vars_ascent)
+
+      x_descent = tf.placeholder(tf.float32, [None, 784])
+      W_descent = tf.Variable(tf.zeros([784, 10]))
+      assign_W_descent = W_descent.assign(W)
+      b_descent = tf.Variable(tf.zeros([10]))
+      assign_b_descent = b_descent.assign(b)
+      y_descent = tf.nn.softmax(tf.matmul(x_descent, W_descent) + b_descent)
+      y__descent = tf.placeholder(tf.float32, [None, 10])
+      cross_entropy_descent = tf.reduce_mean(-tf.reduce_sum(y__descent * tf.log(y_descent), reduction_indices=[1]))
+      
+      gradients_descent = tf.gradients(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES), cross_entropy_descent)
+      grads_and_vars_descent = [(tf.clip_by_norm(grad, 1), var)  for grad, var in gradients_descent]
+      train_op_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate).apply_gradients(grads_and_vars_descent)
 
       # For Test Accuracy Checking
       correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
@@ -86,36 +118,6 @@ def main(_):
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
         
         # Updates learning rate with SALR algorithm
-        base_learning_rate = 0.05
-        n_ascent = 5
-        n_descent = 5
-        freq = 20
-        
-        x_ascent = tf.placeholder(tf.float32, [None, 784])
-        W_ascent = tf.Variable(tf.zeros([784, 10]))
-        assign_W_ascent = W_ascent.assign(W)
-        b_ascent = tf.Variable(tf.zeros([10]))
-        assign_b_ascent = b_ascent.assign(b)
-        y_ascent = tf.nn.softmax(tf.matmul(x_ascent, W_ascent) + b_ascent)
-        y__ascent = tf.placeholder(tf.float32, [None, 10])
-        cross_entropy_ascent = tf.reduce_mean(-tf.reduce_sum(y__ascent * tf.log(y_ascent), reduction_indices=[1]))
-        
-        gradients_ascent = tf.gradients(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES), cross_entropy_ascent)
-        grads_and_vars_ascent = [(tf.clip_by_norm(grad, 1), var)  for grad, var in gradients_ascent]
-        train_op_ascent = tf.train.GradientDescentOptimizer(learning_rate=-base_learning_rate).apply_gradients(grads_and_vars_ascent)
-
-        x_descent = tf.placeholder(tf.float32, [None, 784])
-        W_descent = tf.Variable(tf.zeros([784, 10]))
-        assign_W_descent = W_descent.assign(W)
-        b_descent = tf.Variable(tf.zeros([10]))
-        assign_b_descent = b_descent.assign(b)
-        y_descent = tf.nn.softmax(tf.matmul(x_descent, W_descent) + b_descent)
-        y__descent = tf.placeholder(tf.float32, [None, 10])
-        cross_entropy_descent = tf.reduce_mean(-tf.reduce_sum(y__descent * tf.log(y_descent), reduction_indices=[1]))
-        
-        gradients_descent = tf.gradients(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES), cross_entropy_descent)
-        grads_and_vars_descent = [(tf.clip_by_norm(grad, 1), var)  for grad, var in gradients_descent]
-        train_op_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate).apply_gradients(grads_and_vars_descent)
         
         if not mon_sess.should_stop() and step % freq == freq-1:
           if not mon_sess.should_stop():
@@ -140,7 +142,6 @@ def main(_):
             if not mon_sess.should_stop():
               ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x: batch_xs[i], y_: batch_ys[i]}) 
           stochastic_sharpness = (ascent_loss - descent_loss) / batch_size
-          concat_to_stochastic_sharpness_list = tf.concat(stochastic_sharpness_list, tf.Variable(stochastic_sharpness))
           if not mon_sess.should_stop():
             mon_sess.run(concat_to_stochastic_sharpness_list)
           median_sharpness = 0
