@@ -141,7 +141,7 @@ def main(_):
               descent_loss += mon_sess.run(cross_entropy_descent, feed_dict={x: batch_xs[i], y_: batch_ys[i]})
             if not mon_sess.should_stop():
               ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x: batch_xs[i], y_: batch_ys[i]}) 
-          stochastic_sharpness = (ascent_loss - descent_loss) / batch_size
+          stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
           if not mon_sess.should_stop():
             mon_sess.run(concat_to_stochastic_sharpness_list)
           median_sharpness = 0
