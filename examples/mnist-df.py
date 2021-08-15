@@ -126,6 +126,7 @@ def main(_):
 
       while not mon_sess.should_stop():
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
+        print(batch_xs)
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
         
         # Updates learning rate with SALR algorithm
