@@ -141,17 +141,17 @@ def main(_):
             mon_sess.run(assign_b_descent)
           for i in range(n_ascent):
             if not mon_sess.should_stop():
-              mon_sess.run(train_op_ascent, feed_dict={x: batch_xs, y_: batch_ys})
+              mon_sess.run(train_op_ascent, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys})
           for i in range(n_descent):
             if not mon_sess.should_stop():
-              mon_sess.run(train_op_descent, feed_dict={x: batch_xs, y_: batch_ys})
+              mon_sess.run(train_op_descent, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
           descent_loss = 0
           ascent_loss = 0
           for i in range(batch_size):
             if not mon_sess.should_stop():
-              descent_loss += mon_sess.run(cross_entropy_descent, feed_dict={x: batch_xs[i], y_: batch_ys[i]})
+              descent_loss += mon_sess.run(cross_entropy_descent, feed_dict={x_descent: batch_xs[i], y__descent: batch_ys[i]})
             if not mon_sess.should_stop():
-              ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x: batch_xs[i], y_: batch_ys[i]}) 
+              ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x_ascent: batch_xs[i], y__ascent: batch_ys[i]}) 
           stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
           if not mon_sess.should_stop():
             mon_sess.run(concat_to_stochastic_sharpness_list)
