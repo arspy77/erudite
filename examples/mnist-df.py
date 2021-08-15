@@ -78,9 +78,14 @@ def main(_):
       cross_entropy_ascent = tf.reduce_mean(-tf.reduce_sum(y__ascent * tf.log(y_ascent), reduction_indices=[1]))
       
       
-      gradients_ascent = tf.gradients(cross_entropy_ascent, [W_ascent, b_ascent])
-      grads_ascent = [tf.clip_by_norm(grad, 1)  for grad in gradients_ascent]
-      train_op_ascent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate).apply_gradients(grads_ascent)
+      # gradients_ascent = tf.gradients(cross_entropy_ascent, [W_ascent, b_ascent])
+      # grads_ascent = [tf.clip_by_norm(grad, 1)  for grad in gradients_ascent]
+      # train_op_ascent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate).apply_gradients(grads_ascent)
+
+      opt_ascent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
+      grads_and_vars_ascent = opt_ascent.compute_gradients(cross_entropy_ascent, [W_ascent, b_ascent])
+      capped_grads_and_vars_ascent = [(tf.clip_by_norm(gv[0]), gv[1]) for gv in grads_and_vars_ascent]
+      train_op_ascent = opt_ascent.apply_gradients(capped_grads_and_vars_ascent)
 
       x_descent = tf.placeholder(tf.float32, [None, 784])
       W_descent = tf.Variable(tf.zeros([784, 10]))
@@ -91,9 +96,14 @@ def main(_):
       y__descent = tf.placeholder(tf.float32, [None, 10])
       cross_entropy_descent = tf.reduce_mean(-tf.reduce_sum(y__descent * tf.log(y_descent), reduction_indices=[1]))
       
-      gradients_descent = tf.gradients(cross_entropy_descent, [W_descent, b_descent])
-      grads_descent = [tf.clip_by_norm(grad, 1)  for grad in gradients_descent]
-      train_op_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate).apply_gradients(grads_descent)
+      # gradients_descent = tf.gradients(cross_entropy_descent, [W_descent, b_descent])
+      # grads_descent = [tf.clip_by_norm(grad, 1)  for grad in gradients_descent]
+      # train_op_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate).apply_gradients(grads_descent)
+
+      opt_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
+      grads_and_vars_descent = opt_descent.compute_gradients(cross_entropy_descent, [W_descent, b_descent])
+      capped_grads_and_vars_descent = [(tf.clip_by_norm(gv[0]), gv[1]) for gv in grads_and_vars_descent]
+      train_op_descent = opt_descent.apply_gradients(capped_grads_and_vars_descent)
 
       # For Test Accuracy Checking
       correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
