@@ -84,7 +84,7 @@ def main(_):
 
       opt_ascent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
       grads_and_vars_ascent = opt_ascent.compute_gradients(cross_entropy_ascent, [W_ascent, b_ascent])
-      capped_grads_and_vars_ascent = [(tf.clip_by_norm(gv[0]), gv[1]) for gv in grads_and_vars_ascent]
+      capped_grads_and_vars_ascent = [(tf.clip_by_norm(gv[0], 1), gv[1]) for gv in grads_and_vars_ascent]
       train_op_ascent = opt_ascent.apply_gradients(capped_grads_and_vars_ascent)
 
       x_descent = tf.placeholder(tf.float32, [None, 784])
@@ -102,7 +102,7 @@ def main(_):
 
       opt_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
       grads_and_vars_descent = opt_descent.compute_gradients(cross_entropy_descent, [W_descent, b_descent])
-      capped_grads_and_vars_descent = [(tf.clip_by_norm(gv[0]), gv[1]) for gv in grads_and_vars_descent]
+      capped_grads_and_vars_descent = [(tf.clip_by_norm(gv[0], 1), gv[1]) for gv in grads_and_vars_descent]
       train_op_descent = opt_descent.apply_gradients(capped_grads_and_vars_descent)
 
       # For Test Accuracy Checking
