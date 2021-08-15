@@ -158,7 +158,7 @@ def main(_):
             mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness})
           median_sharpness = 0
           if not mon_sess.should_stop():
-            median_sharpness = get_median(stochastic_sharpness_list)
+            median_sharpness = mon_sess.run(get_median(stochastic_sharpness_list))
             #median_sharpness = mon_sess.run(median_sharpness_op)
           current_learning_rate = 0
           if not mon_sess.should_stop():
@@ -189,7 +189,7 @@ if __name__ == "__main__":
   FLAGS.task_index = TF_CONFIG["task"]["index"]
   FLAGS.ps_hosts = ",".join(TF_CONFIG["cluster"]["ps"])
   FLAGS.worker_hosts = ",".join(TF_CONFIG["cluster"]["worker"])
-  FLAGS.global_steps = 60
+  FLAGS.global_steps = 1000
   FLAGS.use_salr = bool(os.environ["use_salr"]) if "use_salr" in os.environ else True
   #FLAGS.global_steps = int(os.environ["global_steps"]) if "global_steps" in os.environ else 100000
   tf.app.run(main=main, argv=[sys.argv[0]])
