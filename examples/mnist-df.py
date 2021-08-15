@@ -8,7 +8,6 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
 import tensorflow as tf
-import tensorflow_probability as tfp
 import numpy as np
 
 class Empty:
@@ -17,6 +16,11 @@ class Empty:
 batch_size = 1000
 
 FLAGS = Empty()
+
+def get_median(v):
+    v = tf.reshape(v, [-1])
+    mid = v.get_shape()[0]//2 + 1
+    return tf.nn.top_k(v, mid).values[-1]
 
 def main(_):
   ps_hosts = FLAGS.ps_hosts.split(",")
@@ -56,7 +60,7 @@ def main(_):
 
       # For SALR algorithm
       stochastic_sharpness_list = tf.Variable([])
-      median_sharpness_op = tfp.stats.percentile(stochastic_sharpness_list, 50.0, interpolation='midpoint')
+      
 
       # For Test Accuracy Checking
       correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
@@ -141,7 +145,8 @@ def main(_):
             mon_sess.run(concat_to_stochastic_sharpness_list)
           median_sharpness = 0
           if not mon_sess.should_stop():
-            median_sharpness = mon_sess.run(median_sharpness_op)
+            median_sharpness = get_median(stochastic_sharpness_list)
+            #median_sharpness = mon_sess.run(median_sharpness_op)
           current_learning_rate = 0
           if not mon_sess.should_stop():
             current_learning_rate = mon_sess.run(learning_rate)
