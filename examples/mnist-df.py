@@ -61,7 +61,7 @@ def main(_):
       # For SALR algorithm
       stochastic_sharpness_list = tf.Variable([])
       new_stochastic_sharpness = tf.placeholder(tf.float32, shape=[], name="new_stochastic_sharpness")
-      concat_to_stochastic_sharpness_list = tf.concat([stochastic_sharpness_list, new_stochastic_sharpness])
+      concat_to_stochastic_sharpness_list = tf.concat([stochastic_sharpness_list, new_stochastic_sharpness], 0)
       
       base_learning_rate = 0.05
       n_ascent = 5
