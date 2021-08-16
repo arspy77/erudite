@@ -68,7 +68,7 @@ def main(_):
       base_learning_rate = 0.05
       n_ascent = 1
       n_descent = 1
-      freq = 20
+      freq = 5
 
       x_ascent = tf.placeholder(tf.float32, [None, 784])
       W_ascent = tf.Variable(tf.zeros([784, 10]))
