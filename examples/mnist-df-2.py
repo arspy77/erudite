@@ -127,7 +127,7 @@ elif FLAGS.job_name == "worker":
         tf.summary.scalar("accuracy", accuracy)
 
         # merge all summaries into a single "operation" which we can execute in a session
-        summary_op = tf.summary.merge_all
+        summary_op = tf.summary.merge_all()
 
         ################################################################################################################
         # For SALR algorithm ###########################################################################################
