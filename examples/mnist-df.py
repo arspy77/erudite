@@ -78,7 +78,7 @@ def main(_):
       y_ascent = tf.nn.softmax(tf.matmul(x_ascent, W_ascent) + b_ascent)
       y__ascent = tf.placeholder(tf.float32, [None, 10])
       cross_entropy_ascent = tf.reduce_mean(-tf.reduce_sum(y__ascent * tf.log(y_ascent), reduction_indices=[1]))
-      
+      ascent_loss_op = tf.reduce_sum(cross_entropy_ascent)
       
       # gradients_ascent = tf.gradients(cross_entropy_ascent, [W_ascent, b_ascent])
       # grads_ascent = [tf.clip_by_norm(grad, 1)  for grad in gradients_ascent]
@@ -97,6 +97,7 @@ def main(_):
       y_descent = tf.nn.softmax(tf.matmul(x_descent, W_descent) + b_descent)
       y__descent = tf.placeholder(tf.float32, [None, 10])
       cross_entropy_descent = tf.reduce_mean(-tf.reduce_sum(y__descent * tf.log(y_descent), reduction_indices=[1]))
+      descent_loss_op = tf.reduce_sum(cross_entropy_descent)
       
       # gradients_descent = tf.gradients(cross_entropy_descent, [W_descent, b_descent])
       # grads_descent = [tf.clip_by_norm(grad, 1)  for grad in gradients_descent]
@@ -152,10 +153,10 @@ def main(_):
           descent_loss = 0
           ascent_loss = 0
           if not mon_sess.should_stop():
-            descent_loss = mon_sess.run(tf.reduce_sum(cross_entropy_descent, feed_dict={x_descent: batch_xs, y__descent: batch_ys}))
+            descent_loss = mon_sess.run(descent_loss_op, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
             
           if not mon_sess.should_stop():
-            ascent_loss += mon_sess.run(tf.reduce_sum(cross_entropy_ascent, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys}))
+            ascent_loss += mon_sess.run(ascent_loss_op, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys})
               
           stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
           print(stochastic_sharpness)
