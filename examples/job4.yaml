@@ -1,12 +1,12 @@
 apiVersion: kubeflow.org/v1
 kind: TFJob
 metadata:
-  name: job4
+  name: job3
 spec:
-  max-instances: 6
-  min-instances: 2
-  priority: 100
-  cleanPodPolicy: "All"
+  max-instances: 1
+  min-instances: 1
+  priority: 1
+  cleanPodPolicy: "Running"
   tfReplicaSpecs:
     PS:
       replicas: 1
@@ -16,7 +16,7 @@ spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://lsalab.cs.nthu.edu.tw/~ericyeh/DRAGON/mnist-df.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-2.py | python3 -'
             command:
             - /bin/bash
             - -c
@@ -26,17 +26,19 @@ spec:
             - containerPort: 2222
               name: tfjob-port
     Worker:
-      replicas: 2
+      replicas: 1
       restartPolicy: OnFailure
       template:
         spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://lsalab.cs.nthu.edu.tw/~ericyeh/DRAGON/mnist-df.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-2.py | python3 -'
             env:
             - name: global_steps
               value: "100000"
+            - name: use_salr
+              value: "False"
             command:
             - /bin/bash
             - -c
@@ -47,5 +49,5 @@ spec:
               name: tfjob-port
             resources:
               requests:
-                cpu: "2"
-                memory: "4Gi"
+                cpu: "4"
+                memory: "16Gi"
