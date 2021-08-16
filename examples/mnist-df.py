@@ -78,7 +78,7 @@ def main(_):
       # grads_ascent = [tf.clip_by_norm(grad, 1)  for grad in gradients_ascent]
       # train_op_ascent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate).apply_gradients(grads_ascent)
 
-      opt_ascent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
+      opt_ascent = tf.train.GradientDescentOptimizer(learning_rate=-base_learning_rate)
       grads_and_vars_ascent = opt_ascent.compute_gradients(cross_entropy_ascent, [W_ascent, b_ascent])
       capped_grads_and_vars_ascent = [(tf.clip_by_norm(gv[0], 1), gv[1]) for gv in grads_and_vars_ascent]
       train_op_ascent = opt_ascent.apply_gradients(capped_grads_and_vars_ascent)
