@@ -125,9 +125,9 @@ def main(_):
                                            ),
                                            hooks=hooks) as mon_sess:
 
+      print(mon_sess.run(stochastic_sharpness_list))
       while not mon_sess.should_stop():
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
-        print(batch_ys)
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
         
         # Updates learning rate with SALR algorithm
@@ -158,6 +158,8 @@ def main(_):
           if not mon_sess.should_stop():
             mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness})
           median_sharpness = 0
+          if not mon_sess.should_stop():
+            print(mon_sess.run(stochastic_sharpness_list))
           if not mon_sess.should_stop():
             median_sharpness = mon_sess.run(get_stochastic_sharpness_median_op)
             #median_sharpness = mon_sess.run(median_sharpness_op)
