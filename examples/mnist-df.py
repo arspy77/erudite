@@ -54,9 +54,9 @@ def main(_):
       train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy, global_step=global_step)
 
       # For SALR algorithm
-      stochastic_sharpness_list = tf.Variable([-9999.9,9999.0])
+      stochastic_sharpness_list = tf.Variable([0,9999.0])
       new_stochastic_sharpness = tf.placeholder(tf.float32, shape=[], name="new_stochastic_sharpness")
-      concat_to_stochastic_sharpness_list = tf.sort(tf.concat([stochastic_sharpness_list, [new_stochastic_sharpness]], 0))
+      concat_to_stochastic_sharpness_list = tf.concat([stochastic_sharpness_list, [new_stochastic_sharpness]], 0)
       get_stochastic_sharpness_median_op = tf.contrib.distributions.percentile(stochastic_sharpness_list,50.)
       
       base_learning_rate = 0.05
