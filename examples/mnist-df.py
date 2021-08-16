@@ -143,14 +143,14 @@ def main(_):
               mon_sess.run(train_op_descent, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
           descent_loss = 0
           ascent_loss = 0
-          for i in range(batch_size):
+          for i in range(10):
             if not mon_sess.should_stop():
               descent_loss += mon_sess.run(cross_entropy_descent, feed_dict={x_descent: [batch_xs[i]], y__descent: [batch_ys[i]]})
               
             if not mon_sess.should_stop():
               ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x_ascent: [batch_xs[i]], y__ascent: [batch_ys[i]]}) 
               
-          stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
+          stochastic_sharpness = float(ascent_loss - descent_loss) / 10
           print(stochastic_sharpness)
           print("^ss")
           if not mon_sess.should_stop():
