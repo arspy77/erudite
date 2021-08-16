@@ -120,7 +120,7 @@ def main(_):
                                            ),
                                            hooks=hooks) as mon_sess:
 
-      print(mon_sess.run(stochastic_sharpness_list))
+      print(stochastic_sharpness_list.eval())
       while not mon_sess.should_stop():
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
@@ -150,12 +150,12 @@ def main(_):
             if not mon_sess.should_stop():
               ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x_ascent: [batch_xs[i]], y__ascent: [batch_ys[i]]}) 
           stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
-          print(stochastic_sharpness)
+          print("stochastic sharpness" + str(stochastic_sharpness))
           if not mon_sess.should_stop():
-            print(mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness}))
+            mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness})
           median_sharpness = 0
           if not mon_sess.should_stop():
-            print(mon_sess.run(stochastic_sharpness_list))
+            print(stochastic_sharpness_list.eval())
           if not mon_sess.should_stop():
             median_sharpness = mon_sess.run(get_stochastic_sharpness_median_op)
             #median_sharpness = mon_sess.run(median_sharpness_op)
