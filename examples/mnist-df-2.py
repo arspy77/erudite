@@ -230,7 +230,11 @@ elif FLAGS.job_name == "worker":
         for epoch in range(training_epochs):
 
             # number of batches in one epoch
+            print(mnist.train.num_examples)
+            print(batch_size)
             batch_count = int(mnist.train.num_examples / batch_size)
+            print(batch_count)
+
 
             count = 0
             for i in range(batch_count):
