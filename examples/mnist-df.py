@@ -120,7 +120,6 @@ def main(_):
                                            ),
                                            hooks=hooks) as mon_sess:
 
-      print(stochastic_sharpness_list.eval())
       while not mon_sess.should_stop():
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
