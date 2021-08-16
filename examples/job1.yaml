@@ -37,6 +37,8 @@ spec:
             env:
             - name: global_steps
               value: "100000"
+            - name: use_salr
+              value: "True"
             command:
             - /bin/bash
             - -c
