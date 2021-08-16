@@ -127,7 +127,8 @@ def main(_):
         
         # Updates learning rate with SALR algorithm
         print("B")
-        if step % freq == freq-1 and FLAGS.use_salr:
+        print(step)
+        if step % freq == freq and FLAGS.use_salr:
           print("C")
           if not mon_sess.should_stop():
             mon_sess.run(assign_W_ascent)
