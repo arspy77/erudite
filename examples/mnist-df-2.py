@@ -272,7 +272,7 @@ elif FLAGS.job_name == "worker":
                     descent_loss = sess.run(descent_loss_op, feed_dict={x_descent: batch_x, y__descent: batch_y})
                     ascent_loss = sess.run(ascent_loss_op, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
                         
-                    stochastic_sharpness = float(-ascent_loss + descent_loss) / batch_size
+                    stochastic_sharpness = float(ascent_loss + descent_loss) / batch_size
                     print("asc loss : %3.10f" % ascent_loss)
                     print("desc loss : %3.10f" % descent_loss)
                     print(stochastic_sharpness)
