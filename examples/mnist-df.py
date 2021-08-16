@@ -54,10 +54,16 @@ def main(_):
       train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy, global_step=global_step)
 
       # For SALR algorithm
-      stochastic_sharpness_list = tf.Variable([0,9999.0])
-      new_stochastic_sharpness = tf.placeholder(tf.float32, shape=[], name="new_stochastic_sharpness")
-      concat_to_stochastic_sharpness_list = tf.concat([stochastic_sharpness_list, [new_stochastic_sharpness]], 0)
-      get_stochastic_sharpness_median_op = tf.contrib.distributions.percentile(tf.sort(stochastic_sharpness_list),50.)
+
+      learning_rate_multiplicator = tf.Variable(1.0, trainable=False)
+      new_learning_rate_multiplicator = tf.placeholder(tf.float32, shape=[], name="new_learning_rate_multiplicator")
+      update_learning_rate_multiplicator = tf.assign(learning_rate_multiplicator, new_learning_rate_multiplicator)
+      # stochastic_sharpness_list = tf.Variable([0,9999.0])
+      # new_stochastic_sharpness = tf.placeholder(tf.float32, shape=[], name="new_stochastic_sharpness")
+      # concat_to_stochastic_sharpness_list = tf.concat([stochastic_sharpness_list, [new_stochastic_sharpness]], 0)
+      # get_stochastic_sharpness_median_op = tf.contrib.distributions.percentile(tf.sort(stochastic_sharpness_list),50.)
+
+
       
       base_learning_rate = 0.05
       n_ascent = 1
@@ -113,6 +119,8 @@ def main(_):
     # or an error occurs.
     begin_time = time.time()
     test_accuracy = 0
+    if (FLAGS.task_index == 0):
+      stochastic_sharpness_list = np.array([])
     with tf.train.MonitoredTrainingSession(master=server.target,
                                            is_chief=(FLAGS.task_index == 0),
                                            config=tf.ConfigProto(
@@ -126,7 +134,7 @@ def main(_):
         
         # Updates learning rate with SALR algorithm
         print(step)
-        if step % freq == freq-1 and FLAGS.use_salr:
+        if step % freq == 0 and FLAGS.use_salr and FLAGS.task_index == 0:
           if not mon_sess.should_stop():
             mon_sess.run(assign_W_ascent)
           if not mon_sess.should_stop():
@@ -153,18 +161,26 @@ def main(_):
           stochastic_sharpness = float(ascent_loss - descent_loss) / 10
           print(stochastic_sharpness)
           print("^ss")
+          stochastic_sharpness_list =  np.append(stochastic_sharpness_list, stochastic_sharpness)
+
+          median_sharpness = np.median(stochastic_sharpness_list)
           if not mon_sess.should_stop():
-            print(mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness}))
-          median_sharpness = 0
-          if not mon_sess.should_stop():
-            median_sharpness = mon_sess.run(get_stochastic_sharpness_median_op)
-            print(median_sharpness)
-            #median_sharpness = mon_sess.run(median_sharpness_op)
-          current_learning_rate = 0
-          if not mon_sess.should_stop():
-            current_learning_rate = mon_sess.run(learning_rate)
-          if not mon_sess.should_stop():
-            current_learning_rate = mon_sess.run(update_learning_rate, feed_dict={new_learning_rate: (stochastic_sharpness / median_sharpness * current_learning_rate)})
+            mon_sess.run(update_learning_rate_multiplicator, feed_dict={new_learning_rate_multiplicator: stochastic_sharpness / median_sharpness})
+          # if not mon_sess.should_stop():
+          #   print(mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness}))
+          # median_sharpness = 0
+          # if not mon_sess.should_stop():
+          #   median_sharpness = mon_sess.run(get_stochastic_sharpness_median_op)
+          #   print(median_sharpness)
+          #   #median_sharpness = mon_sess.run(median_sharpness_op)
+        current_learning_rate = 0
+        if not mon_sess.should_stop():
+          current_learning_rate = mon_sess.run(learning_rate)
+        current_learning_rate_multiplicator = 0
+        if not mon_sess.should_stop():
+          current_learning_rate_multiplicator = mon_sess.run(learning_rate_multiplicator)
+        if not mon_sess.should_stop():
+          mon_sess.run(update_learning_rate, feed_dict={new_learning_rate: (current_learning_rate_multiplicator * current_learning_rate)})
         
         if step > 55 and not mon_sess.should_stop():
           test_accuracy = mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
