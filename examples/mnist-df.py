@@ -149,7 +149,7 @@ def main(_):
             print("F")
           descent_loss = 0
           ascent_loss = 0
-          for i in range(batch_size):
+          for i in range(1):
             if not mon_sess.should_stop():
               descent_loss += mon_sess.run(cross_entropy_descent, feed_dict={x_descent: [batch_xs[i]], y__descent: [batch_ys[i]]})
               
