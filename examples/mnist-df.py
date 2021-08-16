@@ -14,7 +14,7 @@ class Empty:
   pass
 
 batch_size = 60000
-initial_learning_rate = 0.1
+initial_learning_rate = 0.01
 
 FLAGS = Empty()
 
@@ -66,7 +66,7 @@ def main(_):
 
 
       
-      base_learning_rate = 0.05
+      base_learning_rate = 0.002
       n_ascent = 5
       n_descent = 5
       freq = 2
