@@ -38,7 +38,7 @@ spec:
             - name: global_steps
               value: "100000"
             - name: use_salr
-              value: False
+              value: "False"
             command:
             - /bin/bash
             - -c
