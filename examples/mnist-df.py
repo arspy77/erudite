@@ -57,7 +57,7 @@ def main(_):
       stochastic_sharpness_list = tf.Variable([0,9999.0])
       new_stochastic_sharpness = tf.placeholder(tf.float32, shape=[], name="new_stochastic_sharpness")
       concat_to_stochastic_sharpness_list = tf.concat([stochastic_sharpness_list, [new_stochastic_sharpness]], 0)
-      get_stochastic_sharpness_median_op = tf.contrib.distributions.percentile(stochastic_sharpness_list,50.)
+      get_stochastic_sharpness_median_op = tf.contrib.distributions.percentile(tf.sort(stochastic_sharpness_list),50.)
       
       base_learning_rate = 0.05
       n_ascent = 1
