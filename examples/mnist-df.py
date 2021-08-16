@@ -126,7 +126,7 @@ def main(_):
         
         # Updates learning rate with SALR algorithm
         
-        if not mon_sess.should_stop() and step % freq == freq-1:
+        if not mon_sess.should_stop() and step % freq == freq-1 and FLAGS.use_salr:
           if not mon_sess.should_stop():
             mon_sess.run(assign_W_ascent)
           if not mon_sess.should_stop():
@@ -185,7 +185,7 @@ if __name__ == "__main__":
   FLAGS.ps_hosts = ",".join(TF_CONFIG["cluster"]["ps"])
   FLAGS.worker_hosts = ",".join(TF_CONFIG["cluster"]["worker"])
   FLAGS.global_steps = 1000
-  FLAGS.use_salr = bool(os.environ["use_salr"]) if "use_salr" in os.environ else True
+  FLAGS.use_salr = (True if os.environ["use_salr"] == "True" else False) if "use_salr" in os.environ else True
   #FLAGS.global_steps = int(os.environ["global_steps"]) if "global_steps" in os.environ else 100000
   tf.app.run(main=main, argv=[sys.argv[0]])
   
