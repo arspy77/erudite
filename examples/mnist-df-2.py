@@ -47,17 +47,17 @@ cluster = tf.train.ClusterSpec({"ps": ps_hosts, "worker": worker_hosts})
 # start a server for a specific task
 server = tf.train.Server(cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
 
-# config
-batch_size = 20000  #  As big as will fit on my gpu
-initial_learning_rate = 0.01 #  Fast learning
-training_epochs = 50
-n_hidden = 3000
-logs_path = "/tmp/mnist/2"
-
 # load mnist data set
 from tensorflow.examples.tutorials.mnist import input_data
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
+
+# config
+batch_size = int(mnist.train.num_examples) / 3
+initial_learning_rate = 0.01 
+training_epochs = 50
+n_hidden = 2000
+logs_path = "/tmp/mnist/2"
 
 if FLAGS.job_name == "ps":
     server.join()
@@ -230,10 +230,7 @@ elif FLAGS.job_name == "worker":
         for epoch in range(training_epochs):
 
             # number of batches in one epoch
-            print(mnist.train.num_examples)
-            print(batch_size)
             batch_count = int(mnist.train.num_examples / batch_size)
-            print(batch_count)
 
 
             count = 0
