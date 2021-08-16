@@ -46,7 +46,7 @@ def main(_):
       y_ = tf.placeholder(tf.float32, [None, 10])
       cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
       
-      learning_rate = tf.Variable(0.05, trainable=False)
+      learning_rate = tf.Variable(0.9, trainable=False)
       new_learning_rate = tf.placeholder(tf.float32, shape=[], name="new_learning_rate")
       update_learning_rate = tf.assign(learning_rate, new_learning_rate)
 
@@ -121,15 +121,12 @@ def main(_):
                                            hooks=hooks) as mon_sess:
 
       while not mon_sess.should_stop():
-        print("A")
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         _, step = mon_sess.run([train_step, global_step], feed_dict={x: batch_xs, y_: batch_ys})
         
         # Updates learning rate with SALR algorithm
-        print("B")
         print(step)
         if step % freq == freq-1 and FLAGS.use_salr:
-          print("C")
           if not mon_sess.should_stop():
             mon_sess.run(assign_W_ascent)
           if not mon_sess.should_stop():
@@ -138,46 +135,40 @@ def main(_):
             mon_sess.run(assign_W_descent)
           if not mon_sess.should_stop():
             mon_sess.run(assign_b_descent)
-            print("D")
           for i in range(n_ascent):
             if not mon_sess.should_stop():
               mon_sess.run(train_op_ascent, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys})
-            print("E")
           for i in range(n_descent):
             if not mon_sess.should_stop():
               mon_sess.run(train_op_descent, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
-            print("F")
           descent_loss = 0
           ascent_loss = 0
-          for i in range(1):
+          for i in range(batch_size):
             if not mon_sess.should_stop():
               descent_loss += mon_sess.run(cross_entropy_descent, feed_dict={x_descent: [batch_xs[i]], y__descent: [batch_ys[i]]})
               
             if not mon_sess.should_stop():
               ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x_ascent: [batch_xs[i]], y__ascent: [batch_ys[i]]}) 
               
-          stochastic_sharpness = float(ascent_loss - descent_loss) / 1
-          print("GH")
+          stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
+          print(stochastic_sharpness)
+          print("^ss")
           if not mon_sess.should_stop():
             mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness})
-            print("I")
           median_sharpness = 0
           if not mon_sess.should_stop():
             median_sharpness = mon_sess.run(get_stochastic_sharpness_median_op)
-            print("J")
             #median_sharpness = mon_sess.run(median_sharpness_op)
           current_learning_rate = 0
           if not mon_sess.should_stop():
             current_learning_rate = mon_sess.run(learning_rate)
-            print("K")
           if not mon_sess.should_stop():
             current_learning_rate = mon_sess.run(update_learning_rate, feed_dict={new_learning_rate: (stochastic_sharpness / median_sharpness * current_learning_rate)})
-            print("L")
         
         if step > 55 and not mon_sess.should_stop():
           test_accuracy = mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
         if not mon_sess.should_stop():
-          print("M")
+          print("lr:")
           print(mon_sess.run(learning_rate))
           
            
