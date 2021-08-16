@@ -105,7 +105,7 @@ elif FLAGS.job_name == "worker":
         # specify cost function
         with tf.name_scope('cross_entropy'):
             # this is our cost
-            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=dropout_logits, labels=y_)
+            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=y_)
             loss = tf.reduce_mean(cross_entropy)
 
         # specify optimizer
@@ -167,7 +167,7 @@ elif FLAGS.job_name == "worker":
 
         softmax_logits_ascent = tf.nn.softmax(logits_ascent)
 
-        cross_entropy_ascent = tf.nn.softmax_cross_entropy_with_logits(logits=dropout_logits_ascent, labels=y__ascent)
+        cross_entropy_ascent = tf.nn.softmax_cross_entropy_with_logits(logits=logits_ascent, labels=y__ascent)
         loss_ascent = tf.reduce_mean(cross_entropy_ascent)
         ascent_loss_op = tf.reduce_sum(loss_ascent) ###
 
@@ -203,7 +203,7 @@ elif FLAGS.job_name == "worker":
 
         softmax_logits_descent = tf.nn.softmax(logits_descent)
 
-        cross_entropy_descent = tf.nn.softmax_cross_entropy_with_logits(logits=dropout_logits_descent, labels=y__descent)
+        cross_entropy_descent = tf.nn.softmax_cross_entropy_with_logits(logits=logits_descent, labels=y__descent)
         loss_descent = tf.reduce_mean(cross_entropy_descent)
         descent_loss_op = tf.reduce_sum(loss_descent) ###
 
