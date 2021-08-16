@@ -48,7 +48,7 @@ cluster = tf.train.ClusterSpec({"ps": ps_hosts, "worker": worker_hosts})
 server = tf.train.Server(cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
 
 # config
-batch_size = 15000  #  As big as will fit on my gpu
+batch_size = 20000  #  As big as will fit on my gpu
 initial_learning_rate = 0.01 #  Fast learning
 training_epochs = 50
 n_hidden = 3000
