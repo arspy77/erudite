@@ -145,13 +145,16 @@ def main(_):
           if not mon_sess.should_stop():
             mon_sess.run(assign_b_descent)
           for i in range(n_ascent):
+            batch_xs, batch_ys = mnist.train.next_batch(batch_size)
             if not mon_sess.should_stop():
               mon_sess.run(train_op_ascent, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys})
           for i in range(n_descent):
+            batch_xs, batch_ys = mnist.train.next_batch(batch_size)
             if not mon_sess.should_stop():
               mon_sess.run(train_op_descent, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
           descent_loss = 0
           ascent_loss = 0
+          batch_xs, batch_ys = mnist.train.next_batch(batch_size)
           if not mon_sess.should_stop():
             descent_loss = mon_sess.run(descent_loss_op, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
             
