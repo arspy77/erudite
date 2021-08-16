@@ -54,7 +54,7 @@ def main(_):
       train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy, global_step=global_step)
 
       # For SALR algorithm
-      stochastic_sharpness_list = tf.Variable([])
+      stochastic_sharpness_list = tf.Variable([-9999.9,9999.0])
       new_stochastic_sharpness = tf.placeholder(tf.float32, shape=[], name="new_stochastic_sharpness")
       concat_to_stochastic_sharpness_list = tf.concat([stochastic_sharpness_list, [new_stochastic_sharpness]], 0)
       get_stochastic_sharpness_median_op = tf.contrib.distributions.percentile(stochastic_sharpness_list,50.)
@@ -150,12 +150,9 @@ def main(_):
             if not mon_sess.should_stop():
               ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x_ascent: [batch_xs[i]], y__ascent: [batch_ys[i]]}) 
           stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
-          print("stochastic sharpness" + str(stochastic_sharpness))
           if not mon_sess.should_stop():
             mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness})
           median_sharpness = 0
-          if not mon_sess.should_stop():
-            print(stochastic_sharpness_list.eval())
           if not mon_sess.should_stop():
             median_sharpness = mon_sess.run(get_stochastic_sharpness_median_op)
             #median_sharpness = mon_sess.run(median_sharpness_op)
