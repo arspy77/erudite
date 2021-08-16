@@ -154,10 +154,11 @@ def main(_):
           print(stochastic_sharpness)
           print("^ss")
           if not mon_sess.should_stop():
-            mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness})
+            print(mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness}))
           median_sharpness = 0
           if not mon_sess.should_stop():
             median_sharpness = mon_sess.run(get_stochastic_sharpness_median_op)
+            print(median_sharpness)
             #median_sharpness = mon_sess.run(median_sharpness_op)
           current_learning_rate = 0
           if not mon_sess.should_stop():
