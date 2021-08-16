@@ -283,7 +283,6 @@ elif FLAGS.job_name == "worker":
                     print(median_sharpness)
                     sess.run(update_learning_rate_multiplicator, feed_dict={new_learning_rate_multiplicator: stochastic_sharpness / median_sharpness})
                 
-                current_learning_rate_multiplicator = 0
                 current_learning_rate_multiplicator = sess.run(learning_rate_multiplicator)
                 sess.run(update_learning_rate, feed_dict={new_learning_rate: (current_learning_rate_multiplicator * initial_learning_rate)})
 
