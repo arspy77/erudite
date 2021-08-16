@@ -13,7 +13,7 @@ import numpy as np
 class Empty:
   pass
 
-batch_size = 1000
+batch_size = 10000
 
 FLAGS = Empty()
 
@@ -184,7 +184,7 @@ if __name__ == "__main__":
   FLAGS.task_index = TF_CONFIG["task"]["index"]
   FLAGS.ps_hosts = ",".join(TF_CONFIG["cluster"]["ps"])
   FLAGS.worker_hosts = ",".join(TF_CONFIG["cluster"]["worker"])
-  FLAGS.global_steps = 1000
+  FLAGS.global_steps = 10000
   FLAGS.use_salr = (True if os.environ["use_salr"] == "True" else False) if "use_salr" in os.environ else True
   #FLAGS.global_steps = int(os.environ["global_steps"]) if "global_steps" in os.environ else 100000
   tf.app.run(main=main, argv=[sys.argv[0]])
