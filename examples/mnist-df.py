@@ -60,8 +60,8 @@ def main(_):
       get_stochastic_sharpness_median_op = tf.contrib.distributions.percentile(stochastic_sharpness_list,50.)
       
       base_learning_rate = 0.05
-      n_ascent = 5
-      n_descent = 5
+      n_ascent = 1
+      n_descent = 1
       freq = 20
 
       x_ascent = tf.placeholder(tf.float32, [None, 784])
@@ -126,7 +126,7 @@ def main(_):
         
         # Updates learning rate with SALR algorithm
         
-        if not mon_sess.should_stop() and step % freq == freq-1 and FLAGS.use_salr:
+        if step % freq == freq-1 and FLAGS.use_salr:
           if not mon_sess.should_stop():
             mon_sess.run(assign_W_ascent)
           if not mon_sess.should_stop():
@@ -163,7 +163,8 @@ def main(_):
         
         if step > 55 and not mon_sess.should_stop():
           test_accuracy = mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
-          
+        
+        print(mon_sess.run(learning_rate))
           
            
 
