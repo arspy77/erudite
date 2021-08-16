@@ -3,7 +3,7 @@ kind: TFJob
 metadata:
   name: job2
 spec:
-  max-instances: 2
+  max-instances: 1
   min-instances: 1
   priority: 1
   cleanPodPolicy: "Running"
