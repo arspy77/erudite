@@ -151,19 +151,19 @@ def main(_):
               mon_sess.run(train_op_descent, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
           descent_loss = 0
           ascent_loss = 0
-          for i in range(10):
-            if not mon_sess.should_stop():
-              descent_loss += mon_sess.run(cross_entropy_descent, feed_dict={x_descent: [batch_xs[i]], y__descent: [batch_ys[i]]})
+          if not mon_sess.should_stop():
+            descent_loss = mon_sess.run(tf.reduce_sum(cross_entropy_descent, feed_dict={x_descent: batch_xs, y__descent: batch_ys}))
+            
+          if not mon_sess.should_stop():
+            ascent_loss += mon_sess.run(tf.reduce_sum(cross_entropy_ascent, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys}))
               
-            if not mon_sess.should_stop():
-              ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x_ascent: [batch_xs[i]], y__ascent: [batch_ys[i]]}) 
-              
-          stochastic_sharpness = float(ascent_loss - descent_loss) / 10
+          stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
           print(stochastic_sharpness)
-          print("^ss")
+          print("^ss msv")
           stochastic_sharpness_list =  np.append(stochastic_sharpness_list, stochastic_sharpness)
 
           median_sharpness = np.median(stochastic_sharpness_list)
+          print(median_sharpness)
           if not mon_sess.should_stop():
             mon_sess.run(update_learning_rate_multiplicator, feed_dict={new_learning_rate_multiplicator: stochastic_sharpness / median_sharpness})
           # if not mon_sess.should_stop():
