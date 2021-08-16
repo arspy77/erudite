@@ -62,6 +62,7 @@ def main(_):
       stochastic_sharpness_list = tf.Variable([])
       new_stochastic_sharpness = tf.placeholder(tf.float32, shape=[], name="new_stochastic_sharpness")
       concat_to_stochastic_sharpness_list = tf.concat([stochastic_sharpness_list, [new_stochastic_sharpness]], 0)
+      get_stochastic_sharpness_median_op = get_median(stochastic_sharpness_list)
       
       base_learning_rate = 0.05
       n_ascent = 5
@@ -158,7 +159,7 @@ def main(_):
             mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness})
           median_sharpness = 0
           if not mon_sess.should_stop():
-            median_sharpness = mon_sess.run(get_median(stochastic_sharpness_list))
+            median_sharpness = mon_sess.run(get_stochastic_sharpness_median_op)
             #median_sharpness = mon_sess.run(median_sharpness_op)
           current_learning_rate = 0
           if not mon_sess.should_stop():
