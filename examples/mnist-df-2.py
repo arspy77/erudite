@@ -127,7 +127,7 @@ elif FLAGS.job_name == "worker":
         tf.summary.scalar("accuracy", accuracy)
 
         # merge all summaries into a single "operation" which we can execute in a session
-        summary_op = tf.merge_all_summaries()
+        summary_op = tf.summary.merge_all
         init_op = tf.initialize_all_variables()
         print("Variables initialized ...")
 
@@ -222,7 +222,7 @@ elif FLAGS.job_name == "worker":
       stochastic_sharpness_list = np.array([])
     with sv.prepare_or_wait_for_session(server.target) as sess:
         # create log writer object (this will log on every machine)
-        writer = tf.train.SummaryWriter(logs_path, graph=tf.get_default_graph())
+        writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
         # perform training cycles
         start_time = time.time()
