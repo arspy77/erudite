@@ -161,7 +161,7 @@ def main(_):
           if not mon_sess.should_stop():
             ascent_loss = mon_sess.run(ascent_loss_op, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys})
               
-          stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
+          stochastic_sharpness = float(ascent_loss + descent_loss) / batch_size
           print("asc loss : %3.10f" % ascent_loss)
           print("desc loss : %3.10f" % descent_loss)
           print(stochastic_sharpness)
