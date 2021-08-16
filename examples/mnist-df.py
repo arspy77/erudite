@@ -14,6 +14,7 @@ class Empty:
   pass
 
 batch_size = 10000
+initial_learning_rate = 0.5
 
 FLAGS = Empty()
 
@@ -46,7 +47,7 @@ def main(_):
       y_ = tf.placeholder(tf.float32, [None, 10])
       cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
       
-      learning_rate = tf.Variable(0.9, trainable=False)
+      learning_rate = tf.Variable(initial_learning_rate, trainable=False)
       new_learning_rate = tf.placeholder(tf.float32, shape=[], name="new_learning_rate")
       update_learning_rate = tf.assign(learning_rate, new_learning_rate)
 
@@ -68,7 +69,7 @@ def main(_):
       base_learning_rate = 0.05
       n_ascent = 5
       n_descent = 5
-      freq = 1
+      freq = 2
 
       x_ascent = tf.placeholder(tf.float32, [None, 784])
       W_ascent = tf.Variable(tf.zeros([784, 10]))
@@ -156,9 +157,11 @@ def main(_):
             descent_loss = mon_sess.run(descent_loss_op, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
             
           if not mon_sess.should_stop():
-            ascent_loss += mon_sess.run(ascent_loss_op, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys})
+            ascent_loss = mon_sess.run(ascent_loss_op, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys})
               
           stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
+          print("asc loss : %3.10f" % ascent_loss)
+          print("desc loss : %3.10f" % descent_loss)
           print(stochastic_sharpness)
           print("^ss msv")
           stochastic_sharpness_list =  np.append(stochastic_sharpness_list, stochastic_sharpness)
@@ -174,14 +177,11 @@ def main(_):
           #   median_sharpness = mon_sess.run(get_stochastic_sharpness_median_op)
           #   print(median_sharpness)
           #   #median_sharpness = mon_sess.run(median_sharpness_op)
-        current_learning_rate = 0
-        if not mon_sess.should_stop():
-          current_learning_rate = mon_sess.run(learning_rate)
         current_learning_rate_multiplicator = 0
         if not mon_sess.should_stop():
           current_learning_rate_multiplicator = mon_sess.run(learning_rate_multiplicator)
         if not mon_sess.should_stop():
-          mon_sess.run(update_learning_rate, feed_dict={new_learning_rate: (current_learning_rate_multiplicator * current_learning_rate)})
+          mon_sess.run(update_learning_rate, feed_dict={new_learning_rate: (current_learning_rate_multiplicator * initial_learning_rate)})
         
         if step > 55 and not mon_sess.should_stop():
           test_accuracy = mon_sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
@@ -208,7 +208,7 @@ if __name__ == "__main__":
   FLAGS.task_index = TF_CONFIG["task"]["index"]
   FLAGS.ps_hosts = ",".join(TF_CONFIG["cluster"]["ps"])
   FLAGS.worker_hosts = ",".join(TF_CONFIG["cluster"]["worker"])
-  FLAGS.global_steps = 10000
+  FLAGS.global_steps = 60
   FLAGS.use_salr = (True if os.environ["use_salr"] == "True" else False) if "use_salr" in os.environ else True
   #FLAGS.global_steps = int(os.environ["global_steps"]) if "global_steps" in os.environ else 100000
   tf.app.run(main=main, argv=[sys.argv[0]])
