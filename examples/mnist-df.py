@@ -17,10 +17,6 @@ batch_size = 1000
 
 FLAGS = Empty()
 
-def get_median(v):
-    mid = v.get_shape()[0]//2 + 1
-    return tf.nn.top_k(v, mid).values[-1]
-
 def main(_):
   ps_hosts = FLAGS.ps_hosts.split(",")
   worker_hosts = FLAGS.worker_hosts.split(",")
@@ -61,7 +57,7 @@ def main(_):
       stochastic_sharpness_list = tf.Variable([])
       new_stochastic_sharpness = tf.placeholder(tf.float32, shape=[], name="new_stochastic_sharpness")
       concat_to_stochastic_sharpness_list = tf.concat([stochastic_sharpness_list, [new_stochastic_sharpness]], 0)
-      get_stochastic_sharpness_median_op = get_median(stochastic_sharpness_list)
+      get_stochastic_sharpness_median_op = tf.contrib.distributions.percentile(stochastic_sharpness_list,50.)
       
       base_learning_rate = 0.05
       n_ascent = 5
