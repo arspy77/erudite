@@ -151,11 +151,12 @@ def main(_):
           for i in range(batch_size):
             if not mon_sess.should_stop():
               descent_loss += mon_sess.run(cross_entropy_descent, feed_dict={x_descent: [batch_xs[i]], y__descent: [batch_ys[i]]})
-              print("G")
+              
             if not mon_sess.should_stop():
               ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x_ascent: [batch_xs[i]], y__ascent: [batch_ys[i]]}) 
-              print("H")
+              
           stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
+          print("GH")
           if not mon_sess.should_stop():
             mon_sess.run(concat_to_stochastic_sharpness_list, feed_dict={new_stochastic_sharpness: stochastic_sharpness})
             print("I")
