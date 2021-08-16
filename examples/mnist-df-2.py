@@ -123,8 +123,8 @@ elif FLAGS.job_name == "worker":
             accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
         # create a summary for our cost and accuracy
-        tf.scalar_summary("cost", loss)
-        tf.scalar_summary("accuracy", accuracy)
+        tf.summary.scalar("cost", loss)
+        tf.summary.scalar("accuracy", accuracy)
 
         # merge all summaries into a single "operation" which we can execute in a session
         summary_op = tf.merge_all_summaries()
