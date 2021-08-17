@@ -53,7 +53,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
 # config
-batch_size = mnist.train.num_examples // 4
+batch_size = mnist.train.num_examples // 3
 initial_learning_rate = 0.01 
 training_epochs = 50
 n_hidden = 2000
@@ -273,7 +273,7 @@ elif FLAGS.job_name == "worker":
                     descent_loss = sess.run(descent_loss_op, feed_dict={x_descent: batch_x, y__descent: batch_y})
                     ascent_loss = sess.run(ascent_loss_op, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
                         
-                    stochastic_sharpness = float(ascent_loss + descent_loss) / batch_size
+                    stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
                     print("asc loss : %3.10f" % ascent_loss)
                     print("desc loss : %3.10f" % descent_loss)
                     print(stochastic_sharpness)
