@@ -36,7 +36,7 @@ FLAGS.job_name = TF_CONFIG["task"]["type"]
 FLAGS.task_index = TF_CONFIG["task"]["index"]
 FLAGS.ps_hosts = ",".join(TF_CONFIG["cluster"]["ps"])
 FLAGS.worker_hosts = ",".join(TF_CONFIG["cluster"]["worker"])
-FLAGS.global_steps = 100
+
 FLAGS.use_salr = (True if os.environ["use_salr"] == "True" else False) if "use_salr" in os.environ else True
 
 ps_hosts = FLAGS.ps_hosts.split(",")
@@ -56,8 +56,8 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 batch_size = mnist.train.num_examples // 3
 initial_learning_rate = 0.01 
 training_epochs = 50
-n_hidden_1 = 100
-n_hidden_2 = 30
+n_hidden_1 = 1000
+n_hidden_2 = 300
 logs_path = "/tmp/mnist/2"
 
 if FLAGS.job_name == "ps":
