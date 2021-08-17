@@ -207,7 +207,7 @@ elif FLAGS.job_name == "worker":
         loss_descent = tf.reduce_mean(cross_entropy_descent)
         descent_loss_op = tf.reduce_sum(loss_descent) ###
 
-        opt_descent = tf.train.GradientDescentOptimizer(learning_rate=-base_learning_rate)
+        opt_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
         grads_and_vars_descent = opt_descent.compute_gradients(cross_entropy_descent, [W1_descent, W2_descent, b1_descent, b2_descent])
         capped_grads_and_vars_descent = [(tf.clip_by_norm(gv[0], 1), gv[1]) for gv in grads_and_vars_descent]
         train_op_descent = opt_descent.apply_gradients(capped_grads_and_vars_descent)
