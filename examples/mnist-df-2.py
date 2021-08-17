@@ -53,10 +53,10 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
 # config
-batch_size = mnist.train.num_examples // 3
+batch_size = mnist.train.num_examples // 5
 initial_learning_rate = 0.01 
-training_epochs = 50
-n_hidden = 2000
+training_epochs = 10
+n_hidden = 10
 logs_path = "/tmp/mnist/2"
 
 if FLAGS.job_name == "ps":
