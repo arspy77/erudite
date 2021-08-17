@@ -172,9 +172,9 @@ elif FLAGS.job_name == "worker":
         ascent_loss_op = tf.reduce_sum(loss_ascent) ###
 
         opt_ascent = tf.train.GradientDescentOptimizer(learning_rate=-base_learning_rate)
-        grads_and_vars_ascent = opt_ascent.compute_gradients(cross_entropy_ascent, [W1_ascent, W2_ascent, b1_ascent, b2_ascent])
-        capped_grads_and_vars_ascent = [(tf.clip_by_norm(gv[0], 1), gv[1]) for gv in grads_and_vars_ascent]
-        train_op_ascent = opt_ascent.apply_gradients(capped_grads_and_vars_ascent)
+        grads_and_vars_ascent = tf.gradients(cross_entropy_ascent, [W1_ascent, W2_ascent, b1_ascent, b2_ascent])
+        capped_grads_and_vars_ascent, _ = tf.clip_by_global_norm(grads_and_vars_ascent, 1) 
+        train_op_ascent = opt_ascent.apply_gradients(zip(capped_grads_and_vars_ascent, [W1_ascent, W2_ascent, b1_ascent, b2_ascent]))
 
 
 
@@ -205,12 +205,12 @@ elif FLAGS.job_name == "worker":
 
         cross_entropy_descent = tf.nn.softmax_cross_entropy_with_logits(logits=logits_descent, labels=y__descent)
         loss_descent = tf.reduce_mean(cross_entropy_descent)
-        descent_loss_op = tf.reduce_sum(loss_descent) ###
+        descent_loss_op = tf.reduce_sum(loss_descent) 
 
         opt_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
-        grads_and_vars_descent = opt_descent.compute_gradients(cross_entropy_descent, [W1_descent, W2_descent, b1_descent, b2_descent])
-        capped_grads_and_vars_descent = [(tf.clip_by_norm(gv[0], 1), gv[1]) for gv in grads_and_vars_descent]
-        train_op_descent = opt_descent.apply_gradients(capped_grads_and_vars_descent)
+        grads_and_vars_descent = tf.gradients(cross_entropy_descent, [W1_descent, W2_descent, b1_descent, b2_descent])
+        capped_grads_and_vars_descent, _ = tf.clip_by_global_norm(grads_and_vars_descent, 1) 
+        train_op_descent = opt_descent.apply_gradients(zip(capped_grads_and_vars_descent, [W1_descent, W2_descent, b1_descent, b2_descent]))
 
         init_op = tf.initialize_all_variables()
         print("Variables initialized ...")
