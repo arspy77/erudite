@@ -217,7 +217,7 @@ elif FLAGS.job_name == "worker":
         ascent_loss_op = tf.reduce_sum(loss_ascent) ###
 
         opt_ascent = tf.train.GradientDescentOptimizer(learning_rate=-base_learning_rate)
-        grads_and_vars_ascent = opt_ascent.compute_gradients(cross_entropy_ascent, [W1_ascent, W2_ascent, W3_ascent, b1_ascent, b2_ascent, b3_ascent])
+        grads_and_vars_ascent = tf.gradients(cross_entropy_ascent, [W1_ascent, W2_ascent, W3_ascent, b1_ascent, b2_ascent, b3_ascent])
         capped_grads_and_vars_ascent = zip(tf.clip_by_global_norm(grads_and_vars_ascent, 1), [W1_ascent, W2_ascent, W3_ascent, b1_ascent, b2_ascent, b3_ascent])
         train_op_ascent = opt_ascent.apply_gradients(capped_grads_and_vars_ascent)
 
@@ -261,7 +261,7 @@ elif FLAGS.job_name == "worker":
         descent_loss_op = tf.reduce_sum(loss_descent) ###
 
         opt_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
-        grads_and_vars_descent = opt_descent.compute_gradients(cross_entropy_descent, [W1_descent, W2_descent, W3_descent, b1_descent, b2_descent, b3_descent])
+        grads_and_vars_descent = tf.gradients(cross_entropy_descent, [W1_descent, W2_descent, W3_descent, b1_descent, b2_descent, b3_descent])
         capped_grads_and_vars_descent = zip(tf.clip_by_global_norm(grads_and_vars_descent, 1), [W1_descent, W2_descent, W3_descent, b1_descent, b2_descent, b3_descent]) 
         train_op_descent = opt_descent.apply_gradients(capped_grads_and_vars_descent)
 
