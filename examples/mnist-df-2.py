@@ -270,8 +270,11 @@ elif FLAGS.job_name == "worker":
                     
                     descent_loss = 0
                     ascent_loss = 0
-                    descent_loss = sess.run(descent_loss_op, feed_dict={x_descent: batch_x, y__descent: batch_y})
-                    ascent_loss = sess.run(ascent_loss_op, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
+                    for i in range(batch_size):
+                        descent_loss += sess.run(cross_entropy_descent, feed_dict={x_descent: [batch_x[i]], y__descent: [batch_y[i]]})
+                        ascent_loss += sess.run(cross_entropy_ascent, feed_dict={x_ascent: [batch_x[i]], y__ascent: [batch_y[i]]}) 
+                    # descent_loss = sess.run(descent_loss_op, feed_dict={x_descent: batch_x, y__descent: batch_y})
+                    # ascent_loss = sess.run(ascent_loss_op, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
                         
                     stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
                     print("asc loss : %3.10f" % ascent_loss)
