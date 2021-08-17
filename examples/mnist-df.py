@@ -13,7 +13,7 @@ import numpy as np
 class Empty:
   pass
 
-batch_size = 60000
+batch_size = 100
 initial_learning_rate = 0.01
 
 FLAGS = Empty()
@@ -152,13 +152,13 @@ def main(_):
               mon_sess.run(train_op_descent, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
           descent_loss = 0
           ascent_loss = 0
-          if not mon_sess.should_stop():
-            descent_loss = mon_sess.run(descent_loss_op, feed_dict={x_descent: batch_xs, y__descent: batch_ys})
-            
-          if not mon_sess.should_stop():
-            ascent_loss = mon_sess.run(ascent_loss_op, feed_dict={x_ascent: batch_xs, y__ascent: batch_ys})
+          for i in range(batch_size):
+            if not mon_sess.should_stop():
+              descent_loss += mon_sess.run(cross_entropy_descent, feed_dict={x_descent: [batch_xs[i]], y__descent: [batch_ys[i]]})
+            if not mon_sess.should_stop():
+              ascent_loss += mon_sess.run(cross_entropy_ascent, feed_dict={x_ascent: [batch_xs[i]], y__ascent: [batch_ys[i]]})
               
-          stochastic_sharpness = float(ascent_loss + descent_loss) / batch_size
+          stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
           print("asc loss : %3.10f" % ascent_loss)
           print("desc loss : %3.10f" % descent_loss)
           print(stochastic_sharpness)
@@ -207,7 +207,7 @@ if __name__ == "__main__":
   FLAGS.task_index = TF_CONFIG["task"]["index"]
   FLAGS.ps_hosts = ",".join(TF_CONFIG["cluster"]["ps"])
   FLAGS.worker_hosts = ",".join(TF_CONFIG["cluster"]["worker"])
-  FLAGS.global_steps = 1000
+  FLAGS.global_steps = 10000
   FLAGS.use_salr = (True if os.environ["use_salr"] == "True" else False) if "use_salr" in os.environ else True
   #FLAGS.global_steps = int(os.environ["global_steps"]) if "global_steps" in os.environ else 100000
   tf.app.run(main=main, argv=[sys.argv[0]])

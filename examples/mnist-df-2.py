@@ -53,9 +53,9 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
 # config
-batch_size = 100
+batch_size = mnist.train.num_examples // 3
 initial_learning_rate = 0.01 
-training_epochs = 10
+training_epochs = 5
 n_hidden = 10
 logs_path = "/tmp/mnist/2"
 
