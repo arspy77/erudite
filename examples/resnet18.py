@@ -16,6 +16,9 @@ import keras
 from tensorflow.keras import datasets,models,layers
 from keras import backend as K
 from tensorflow.keras.applications import ResNet50, ResNet101
+import os
+
+use_salr = (True if os.environ["use_salr"] == "True" else False) if "use_salr" in os.environ else True
 
 device_name = tf.test.gpu_device_name()
 if device_name != '/device:GPU:0':
@@ -229,7 +232,7 @@ def step_fn(iterator):
         ################
         ### FOR SALR ###
         ################
-        if step % 4 == 0:
+        if  cluster_resolver.task_id == 0 and use_salr:
             model_ascent = ResNet18(10)
             model_ascent.build(input_shape = (None,32,32,3))
             model_ascent.set_weights(model.get_weights())
@@ -247,10 +250,10 @@ def step_fn(iterator):
                     # The operations that the layer applies
                     # to its inputs are going to be recorded
                     # on the GradientTape.
-                    logits_ascent = model_ascent(x_batch_train, training=True)  # Logits for this minibatch
+                    logits_ascent = model_ascent(batch_data, training=True)  # Logits for this minibatch
 
                     # Compute the loss value for this minibatch.
-                    loss_value_ascent = loss_fn(y_batch_train, logits_ascent)
+                    loss_value_ascent = loss_fn(labels, logits_ascent)
 
                 grads_ascent = tape_ascent.gradient(loss_value_ascent, model_ascent.trainable_weights)
                 clipped_grads_ascent, _ = tf.clip_by_global_norm(grads_ascent, 1.0)
@@ -263,10 +266,10 @@ def step_fn(iterator):
                     # The operations that the layer applies
                     # to its inputs are going to be recorded
                     # on the GradientTape.
-                    logits_descent = model_descent(x_batch_train, training=True)  # Logits for this minibatch
+                    logits_descent = model_descent(batch_data, training=True)  # Logits for this minibatch
 
                     # Compute the loss value for this minibatch.
-                    loss_value_descent = loss_fn(y_batch_train, logits_descent)
+                    loss_value_descent = loss_fn(labels, logits_descent)
                 
                 grads_descent = tape_descent.gradient(loss_value_descent, model_descent.trainable_weights)
                 clipped_grads_descent, _ = tf.clip_by_global_norm(grads_descent, 1.0)
@@ -292,12 +295,10 @@ def step_fn(iterator):
         # the value of the variables to minimize the loss.
         optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
-        # Log every 200 batches.
-        if step % 200 == 0:
-            print(
-                "Training loss (for one batch) at step %d: %.4f"  % (step, float(loss_value))
-            )
-            print("Seen so far: %s samples" % ((step + 1) * 64))
+        # Log every 200 batches
+        print(
+                "Training loss (for one batch): %.4f"  % (float(loss_value))
+        )
         return loss_value
 
     batch_data, labels = next(iterator)
