@@ -1,13 +1,5 @@
-FROM tensorflow/tensorflow:latest-gpu-jupyter
-
-RUN pip install --upgrade pip
-
-RUN pip uninstall tensorflow keras -y
-
-RUN pip install tf-nightly
+FROM tensorflow/tensorflow:1.15.0-py3
 
 RUN pip install sklearn
 
-RUN pip install --upgrade cython
-
-RUN pip install pandas
+RUN pip install keras
