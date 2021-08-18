@@ -21,7 +21,7 @@ spec:
             - /bin/bash
             - -c
             image: gcr.io/large-batch-training/keras-container
-            name: keras-container
+            name: tensorflow
             ports:
             - containerPort: 2222
               name: tfjob-port
@@ -43,7 +43,7 @@ spec:
             - /bin/bash
             - -c
             image: gcr.io/large-batch-training/keras-container
-            name: keras-container
+            name: tensorflow
             ports:
             - containerPort: 2222
               name: tfjob-port
