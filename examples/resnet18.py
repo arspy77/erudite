@@ -208,7 +208,7 @@ with strategy.scope():
 
     stochastic_sharpness_list = np.array([])
 
-@tf.function
+@tf.function(autograph=False)
 def step_fn(iterator):
 
     def replica_fn(batch_data, labels):
