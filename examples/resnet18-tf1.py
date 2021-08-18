@@ -122,7 +122,7 @@ class ResNet18(Model):
         """
         super().__init__(**kwargs)
         self.conv_1 = Conv2D(64, (7, 7), strides=2,
-                             padding="same", kernel_initializer="he_normal")
+                             padding="same", kernel_initializer="he_normal", input_shape=(None,32,32,3))
         self.init_bn = BatchNormalization()
         self.pool_2 = MaxPool2D(pool_size=(2, 2), strides=2, padding="same")
         self.res_1_1 = ResnetBlock(64)
@@ -184,11 +184,8 @@ elif FLAGS.job_name == "worker":
         keras.backend.manual_variable_initialization(True)
 
         model = ResNet18(10)
-        model.build(input_shape = (None,32,32,3))
         model_ascent = ResNet18(10)
-        model_ascent.build(input_shape = (None,32,32,3))
         model_descent = ResNet18(10)
-        model_descent.build(input_shape = (None,32,32,3))
 
         targets = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
         
