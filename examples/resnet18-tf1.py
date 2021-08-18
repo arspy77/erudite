@@ -136,6 +136,10 @@ class ResNet18(Model):
         self.avg_pool = GlobalAveragePooling2D()
         self.flat = Flatten()
         self.fc = Dense(num_classes, activation="softmax")
+    
+    def build(self, input_shape):
+        self.fc(self.flat(self.avg_pool(self.res_4_2(self.res_4_1(self.res_3_2(self.res_3_1(self.res_2_2(self.res_2_1(self.res_1_2(
+            self.res_1_1(self.pool_2(tf.nn.relu(self.init_bn(self.conv_1(tf.keras.layers.Input(shape=(None,32,32,3), name="input_x"))))))))))))))))
 
     def call(self, inputs):
         out = self.conv_1(inputs)
