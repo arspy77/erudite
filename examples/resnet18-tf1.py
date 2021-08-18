@@ -184,8 +184,11 @@ elif FLAGS.job_name == "worker":
         keras.backend.manual_variable_initialization(True)
 
         model = ResNet18(10)
+        model.build(input_shape = (None,32,32,3))
         model_ascent = ResNet18(10)
+        model_ascent.build(input_shape = (None,32,32,3))
         model_descent = ResNet18(10)
+        model_descent.build(input_shape = (None,32,32,3))
 
         targets = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
         
