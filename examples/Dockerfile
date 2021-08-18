@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:1.15.2-py3
+FROM tensorflow/tensorflow:latest-gpu-jupyter
 
 RUN pip uninstall tensorflow keras -y
 
