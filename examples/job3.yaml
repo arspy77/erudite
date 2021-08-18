@@ -16,7 +16,7 @@ spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-2.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/resnet18.py | python3 -'
             command:
             - /bin/bash
             - -c
@@ -33,7 +33,7 @@ spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-2.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/resnet18.py | python3 -'
             env:
             - name: global_steps
               value: "100000"
