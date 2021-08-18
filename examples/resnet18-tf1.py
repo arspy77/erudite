@@ -82,7 +82,7 @@ class ResnetBlock(Model):
         INIT_SCHEME = "he_normal"
 
         self.conv_1 = Conv2D(self.__channels, strides=self.__strides[0],
-                             kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME)
+                             kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME, input_shape=(None,32,32,3))
         self.bn_1 = BatchNormalization()
         self.conv_2 = Conv2D(self.__channels, strides=self.__strides[1],
                              kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME)
