@@ -308,8 +308,7 @@ elif FLAGS.job_name == "worker":
 
     begin_time = time.time()
     frequency = 100
-    if (FLAGS.task_index == 0):
-      stochastic_sharpness_list = np.array([])
+    stochastic_sharpness_list = np.array([])
     with sv.prepare_or_wait_for_session(server.target) as sess:
         # create log writer object (this will log on every machine)
         writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
