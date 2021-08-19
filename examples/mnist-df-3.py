@@ -55,7 +55,7 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 # config
 batch_size = 100
 initial_learning_rate = 0.01 
-training_epochs = 100
+training_epochs = 50
 n_hidden_1 = 200
 n_hidden_2 = 80
 # n_hidden_3 = 1000
@@ -163,7 +163,15 @@ elif FLAGS.job_name == "worker":
         # learning_rate_multiplicator = tf.Variable(1.0, trainable=False)
         # new_learning_rate_multiplicator = tf.placeholder(tf.float32, shape=[], name="new_learning_rate_multiplicator")
         # update_learning_rate_multiplicator = tf.assign(learning_rate_multiplicator, new_learning_rate_multiplicator)
-        
+        median_sharpness_list = []
+        new_median_sharpness_list = []
+        update_median_sharpness_list = []
+        for i in range(len(worker_hosts)):
+            median_sharpness_list.append(tf.Variable(0, trainable=False))
+            new_median_sharpness_list.append(tf.placeholder(tf.float32, shape=[], name="new_median_sharpness_" + str(i)))
+            update_median_sharpness_list.append(tf.assign(median_sharpness_list[i], new_median_sharpness_list[i]))
+
+
         base_learning_rate = 0.002
         n_ascent = 5
         n_descent = 5
@@ -378,8 +386,18 @@ elif FLAGS.job_name == "worker":
                     stochastic_sharpness_list =  np.append(stochastic_sharpness_list, stochastic_sharpness)
 
                     median_sharpness = np.median(stochastic_sharpness_list)
+                    
+                    current_median_sharpness_list = np.array([median_sharpness])
+                    for i in range(len(worker_hosts)):
+                        if i == FLAGS.task_index:
+                            sess.run(update_median_sharpness_list[i], feed_dict={new_median_sharpness_list[i]: median_sharpness})
+                        else:
+                            current_median_sharpness_list.append(sess.run(median_sharpness_list[i]))
+                    
+                    total_median_sharpness = np.median(current_median_sharpness_list)
+
                    # print("median sharpness: %3.10f" % median_sharpness)
-                    sess.run(update_learning_rate, feed_dict={new_learning_rate: stochastic_sharpness / median_sharpness * initial_learning_rate})
+                    sess.run(update_learning_rate, feed_dict={new_learning_rate: stochastic_sharpness / total_median_sharpness * initial_learning_rate})
        
         if (FLAGS.task_index == 0):
             print("Test-Accuracy: %2.10f" % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}) *100))
