@@ -197,19 +197,19 @@ elif FLAGS.job_name == "worker":
 
         targets = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
         
-        predictions = model.output
+        predictions = model.layers[-1].output
         loss = tf.reduce_mean(
             keras.losses.categorical_crossentropy(targets, predictions))
 
         targets_ascent = tf.placeholder(tf.float32, shape=[None, 10], name="y-input_ascent")
         
-        predictions_ascent = model_ascent.output
+        predictions_ascent = model_ascent.layers[-1].output
         loss_ascent = tf.reduce_mean(
             keras.losses.categorical_crossentropy(targets_ascent, predictions_ascent))
 
         targets_descent = tf.placeholder(tf.float32, shape=[None, 10], name="y-input_descent")
         
-        predictions_descent = model_descent.output
+        predictions_descent = model_descent.layers[-1].output
         loss_descent = tf.reduce_mean(
             keras.losses.categorical_crossentropy(targets_descent, predictions_descent))
 
