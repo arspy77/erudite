@@ -262,13 +262,12 @@ elif FLAGS.job_name == "worker":
                 _, cost, summary, step, train_accuracy = sess.run([train_op, loss, summary_op, global_step, accuracy],
                     feed_dict={x: batch_x, y_: batch_y})
                 writer.add_summary(summary, step)
-                print(sess.run(learning_rate))
 
                 count += 1
                 if count % frequency == 0 or i + 1 == batch_count:
                     elapsed_time = time.time() - start_time
                     start_time = time.time()
-                    print("Step: %d," % (step + 1), " Epoch: %2d," % (epoch + 1),
+                    print("Step: %d," % (step + 1), " Epoch: %2d," % (step//batch_count + 1),
                           " Batch: %3d of %3d," % (i + 1, batch_count), " Cost: %.4f," % cost,
                           " Train acc %2.2f" % (train_accuracy * 100),
                           " AvgTime: %3.2fms" % float(elapsed_time * 1000 / frequency),
