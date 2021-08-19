@@ -137,9 +137,9 @@ class ResNet18(Model):
         self.flat = Flatten()
         self.fc = Dense(num_classes, activation="softmax")
     
-    def build(self, input_shape):
-        self.fc(self.flat(self.avg_pool(self.res_4_2(self.res_4_1(self.res_3_2(self.res_3_1(self.res_2_2(self.res_2_1(self.res_1_2(
-            self.res_1_1(self.pool_2(self.init_bn(self.conv_1(keras.Input(shape=input_shape, name="input_x")))))))))))))))
+    # def build(self, input_shape):
+    #     self.fc(self.flat(self.avg_pool(self.res_4_2(self.res_4_1(self.res_3_2(self.res_3_1(self.res_2_2(self.res_2_1(self.res_1_2(
+    #         self.res_1_1(self.pool_2(self.init_bn(self.conv_1(keras.Input(shape=input_shape, name="input_x")))))))))))))))
 
     def call(self, inputs):
         out = self.conv_1(inputs)
@@ -160,13 +160,6 @@ if FLAGS.job_name == "ps":
 
 elif FLAGS.job_name == "worker":
     # Assign operations to local server
-    model = ResNet18(10)
-    model.build((32,32,3))
-    model_ascent = ResNet18(10)
-    model_ascent.build((32,32,3))
-    model_descent = ResNet18(10)
-    model_descent.build((32,32,3))
-
     with tf.device(tf.train.replica_device_setter(
             worker_device="/job:worker/task:%d" % FLAGS.task_index,
             cluster=cluster)):
@@ -194,7 +187,13 @@ elif FLAGS.job_name == "worker":
         keras.backend.set_learning_phase(1)
         keras.backend.manual_variable_initialization(True)
 
-        
+        model = ResNet18(10)
+        model.build((32,32,3))
+        model_ascent = ResNet18(10)
+        model_ascent.build((32,32,3))
+        model_descent = ResNet18(10)
+        model_descent.build((32,32,3))
+
 
         targets = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
         
