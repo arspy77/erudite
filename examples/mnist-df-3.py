@@ -392,7 +392,7 @@ elif FLAGS.job_name == "worker":
                         if i == FLAGS.task_index:
                             sess.run(update_median_sharpness_list[i], feed_dict={new_median_sharpness_list[i]: median_sharpness})
                         else:
-                            current_median_sharpness_list.append(sess.run(median_sharpness_list[i]))
+                            np.append(current_median_sharpness_list, sess.run(median_sharpness_list[i]))
                     
                     total_median_sharpness = np.median(current_median_sharpness_list)
 
