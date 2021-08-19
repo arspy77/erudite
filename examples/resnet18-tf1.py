@@ -25,7 +25,7 @@ from keras.datasets import cifar10
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.optimizers import SGD
+from keras.optimizers import SGD
 import numpy as np
 import os
 import ast
