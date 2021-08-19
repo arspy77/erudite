@@ -304,7 +304,7 @@ elif FLAGS.job_name == "worker":
 
                     median_sharpness = np.median(stochastic_sharpness_list)
                     print("median sharpness: %3.10f" % median_sharpness)
-                    sess.run(update_learning_rate_multiplicator, feed_dict={new_learning_rate: stochastic_sharpness / median_sharpness * initial_learning_rate})
+                    sess.run(update_learning_rate, feed_dict={new_learning_rate: stochastic_sharpness / median_sharpness * initial_learning_rate})
 
         print("Test-Accuracy: %2.2f" % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}) *100))
         print("Total Time: %3.2fs" % float(time.time() - begin_time))
