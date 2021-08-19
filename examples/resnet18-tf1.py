@@ -160,6 +160,13 @@ if FLAGS.job_name == "ps":
 
 elif FLAGS.job_name == "worker":
     # Assign operations to local server
+    model = ResNet18(10)
+    model.build((32,32,3))
+    model_ascent = ResNet18(10)
+    model_ascent.build((32,32,3))
+    model_descent = ResNet18(10)
+    model_descent.build((32,32,3))
+
     with tf.device(tf.train.replica_device_setter(
             worker_device="/job:worker/task:%d" % FLAGS.task_index,
             cluster=cluster)):
@@ -187,12 +194,7 @@ elif FLAGS.job_name == "worker":
         keras.backend.set_learning_phase(1)
         keras.backend.manual_variable_initialization(True)
 
-        model = ResNet18(10)
-        model.build((32,32,3))
-        model_ascent = ResNet18(10)
-        model_ascent.build((32,32,3))
-        model_descent = ResNet18(10)
-        model_descent.build((32,32,3))
+        
 
         targets = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
         
