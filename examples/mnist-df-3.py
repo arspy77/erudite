@@ -273,7 +273,7 @@ elif FLAGS.job_name == "worker":
                     count = 0
                 
                 # Updates learning rate with SALR algorithm
-                if FLAGS.use_salr and FLAGS.task_index == 0 and count % 2 == 0:
+                if FLAGS.use_salr and FLAGS.task_index == 0:
                     sess.run(assign_W1_ascent)
                     sess.run(assign_b1_ascent)
                     sess.run(assign_W1_descent)
