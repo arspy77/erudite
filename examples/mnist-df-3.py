@@ -167,7 +167,7 @@ elif FLAGS.job_name == "worker":
         new_median_sharpness_list = []
         update_median_sharpness_list = []
         for i in range(len(worker_hosts)):
-            median_sharpness_list.append(tf.Variable(0, trainable=False))
+            median_sharpness_list.append(tf.Variable(0., trainable=False))
             new_median_sharpness_list.append(tf.placeholder(tf.float32, shape=[], name="new_median_sharpness_" + str(i)))
             update_median_sharpness_list.append(tf.assign(median_sharpness_list[i], new_median_sharpness_list[i]))
 
