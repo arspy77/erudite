@@ -183,10 +183,9 @@ elif FLAGS.job_name == "worker":
 
         cross_entropy_ascent = tf.nn.softmax_cross_entropy_with_logits(logits=logits_ascent, labels=y__ascent)
         loss_ascent = tf.reduce_mean(cross_entropy_ascent)
-        ascent_loss_op = tf.reduce_sum(loss_ascent) ###
 
         opt_ascent = tf.train.GradientDescentOptimizer(learning_rate=-base_learning_rate)
-        grads_and_vars_ascent = tf.gradients(cross_entropy_ascent, [W1_ascent, W2_ascent, W3_ascent, b1_ascent, b2_ascent, b3_ascent])
+        grads_and_vars_ascent = tf.gradients(loss_ascent, [W1_ascent, W2_ascent, W3_ascent, b1_ascent, b2_ascent, b3_ascent])
         capped_grads_and_vars_ascent, _ = tf.clip_by_global_norm(grads_and_vars_ascent, 1)
         train_op_ascent = opt_ascent.apply_gradients(zip(capped_grads_and_vars_ascent, [W1_ascent, W2_ascent, W3_ascent, b1_ascent, b2_ascent, b3_ascent]))
 
@@ -227,10 +226,9 @@ elif FLAGS.job_name == "worker":
 
         cross_entropy_descent = tf.nn.softmax_cross_entropy_with_logits(logits=logits_descent, labels=y__descent)
         loss_descent = tf.reduce_mean(cross_entropy_descent)
-        descent_loss_op = tf.reduce_sum(loss_descent) ###
 
         opt_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
-        grads_and_vars_descent = tf.gradients(cross_entropy_descent, [W1_descent, W2_descent, W3_descent, b1_descent, b2_descent, b3_descent])
+        grads_and_vars_descent = tf.gradients(loss_descent, [W1_descent, W2_descent, W3_descent, b1_descent, b2_descent, b3_descent])
         capped_grads_and_vars_descent, _ = tf.clip_by_global_norm(grads_and_vars_descent, 1) 
         train_op_descent = opt_descent.apply_gradients(zip(capped_grads_and_vars_descent, [W1_descent, W2_descent, W3_descent, b1_descent, b2_descent, b3_descent]))
 
@@ -294,8 +292,8 @@ elif FLAGS.job_name == "worker":
                     for i in range(n_descent):
                         sess.run(train_op_descent, feed_dict={x_descent: batch_x, y__descent: batch_y})
 
-                    descent_loss = sess.run(ascent_loss, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
-                    ascent_loss = sess.run(descent_loss, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
+                    ascent_loss = sess.run(loss_ascent, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
+                    descent_loss = sess.run(loss_descent, feed_dict={x_descent: batch_x, y__descent: batch_y})
                         
                     stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
                     print("asc loss : %3.10f" % ascent_loss)
