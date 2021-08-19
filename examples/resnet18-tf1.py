@@ -82,7 +82,7 @@ class ResnetBlock(Model):
         INIT_SCHEME = "he_normal"
 
         self.conv_1 = Conv2D(self.__channels, strides=self.__strides[0],
-                             kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME, input_shape=(None,32,32,3))
+                             kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME)
         self.bn_1 = BatchNormalization()
         self.conv_2 = Conv2D(self.__channels, strides=self.__strides[1],
                              kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME)
@@ -122,7 +122,7 @@ class ResNet18(Model):
         """
         super().__init__(**kwargs)
         self.conv_1 = Conv2D(64, (7, 7), strides=2,
-                             padding="same", kernel_initializer="he_normal", input_shape=(None,32,32,3))
+                             padding="same", kernel_initializer="he_normal", input_shape=(32,32,3))
         self.init_bn = BatchNormalization()
         self.pool_2 = MaxPool2D(pool_size=(2, 2), strides=2, padding="same")
         self.res_1_1 = ResnetBlock(64)
