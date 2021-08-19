@@ -55,12 +55,12 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 # config
 batch_size = 100
 initial_learning_rate = 0.01 
-training_epochs = 50
-n_hidden_1 = 1000
-n_hidden_2 = 1000
-n_hidden_3 = 1000
-n_hidden_4 = 1000
-n_hidden_5 = 1000
+training_epochs = 100
+n_hidden_1 = 200
+n_hidden_2 = 80
+# n_hidden_3 = 1000
+# n_hidden_4 = 1000
+# n_hidden_5 = 1000
 logs_path = "/tmp/mnist/2"
 
 if FLAGS.job_name == "ps":
@@ -90,26 +90,26 @@ elif FLAGS.job_name == "worker":
                                  shape=(n_hidden_1, n_hidden_2),
                                  initializer=tf.contrib.layers.xavier_initializer())
             W3 = tf.get_variable('W3',
-                                 shape=(n_hidden_2, n_hidden_3),
+                                 shape=(n_hidden_2, 10),
                                  initializer=tf.contrib.layers.xavier_initializer())
-            W4 = tf.get_variable('W4',
-                                 shape=(n_hidden_3, n_hidden_4),
-                                 initializer=tf.contrib.layers.xavier_initializer())
-            W5 = tf.get_variable('W5',
-                                 shape=(n_hidden_4, n_hidden_5),
-                                 initializer=tf.contrib.layers.xavier_initializer())
-            W6 = tf.get_variable('W6',
-                                 shape=(n_hidden_5, 10),
-                                 initializer=tf.contrib.layers.xavier_initializer())
+            # W4 = tf.get_variable('W4',
+            #                      shape=(n_hidden_3, n_hidden_4),
+            #                      initializer=tf.contrib.layers.xavier_initializer())
+            # W5 = tf.get_variable('W5',
+            #                      shape=(n_hidden_4, n_hidden_5),
+            #                      initializer=tf.contrib.layers.xavier_initializer())
+            # W6 = tf.get_variable('W6',
+            #                      shape=(n_hidden_5, 10),
+            #                      initializer=tf.contrib.layers.xavier_initializer())
 
         # bias
         with tf.name_scope("biases"):
             b1 = tf.Variable(tf.zeros([n_hidden_1]))
             b2 = tf.Variable(tf.zeros([n_hidden_2]))
-            b3 = tf.Variable(tf.zeros([n_hidden_3]))
-            b4 = tf.Variable(tf.zeros([n_hidden_4]))
-            b5 = tf.Variable(tf.zeros([n_hidden_5]))
-            b6 = tf.Variable(tf.zeros([10]))
+            b3 = tf.Variable(tf.zeros([10]))
+            # b4 = tf.Variable(tf.zeros([n_hidden_4]))
+            # b5 = tf.Variable(tf.zeros([n_hidden_5]))
+            # b6 = tf.Variable(tf.zeros([10]))
 
         # implement model
         with tf.name_scope("softmax"):
@@ -118,13 +118,13 @@ elif FLAGS.job_name == "worker":
             a2 = tf.nn.sigmoid(z2)
             z3 = tf.add(tf.matmul(a2, W2), b2)
             a3 = tf.nn.sigmoid(z3)
-            z4 = tf.add(tf.matmul(a3, W3), b3)
-            a4 = tf.nn.sigmoid(z4)
-            z5 = tf.add(tf.matmul(a4, W4), b4)
-            a5 = tf.nn.sigmoid(z5)
-            z6 = tf.add(tf.matmul(a5, W5), b5)
-            a6 = tf.nn.sigmoid(z6)
-            logits = tf.add(tf.matmul(a6, W6), b6)
+            # z4 = tf.add(tf.matmul(a3, W3), b3)
+            # a4 = tf.nn.sigmoid(z4)
+            # z5 = tf.add(tf.matmul(a4, W4), b4)
+            # a5 = tf.nn.sigmoid(z5)
+            # z6 = tf.add(tf.matmul(a5, W5), b5)
+            # a6 = tf.nn.sigmoid(z6)
+            logits = tf.add(tf.matmul(a3, W3), b3)
             dropout_logits = tf.nn.dropout(logits, 0.5)
 
             softmax_logits = tf.nn.softmax(logits)
@@ -132,7 +132,7 @@ elif FLAGS.job_name == "worker":
         # specify cost function
         with tf.name_scope('cross_entropy'):
             # this is our cost
-            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=dropout_logits, labels=y_)
+            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=y_)
             loss = tf.reduce_mean(cross_entropy)
 
         # specify optimizer
@@ -160,9 +160,9 @@ elif FLAGS.job_name == "worker":
         # For SALR algorithm ###########################################################################################
         ################################################################################################################
 
-        learning_rate_multiplicator = tf.Variable(1.0, trainable=False)
-        new_learning_rate_multiplicator = tf.placeholder(tf.float32, shape=[], name="new_learning_rate_multiplicator")
-        update_learning_rate_multiplicator = tf.assign(learning_rate_multiplicator, new_learning_rate_multiplicator)
+        # learning_rate_multiplicator = tf.Variable(1.0, trainable=False)
+        # new_learning_rate_multiplicator = tf.placeholder(tf.float32, shape=[], name="new_learning_rate_multiplicator")
+        # update_learning_rate_multiplicator = tf.assign(learning_rate_multiplicator, new_learning_rate_multiplicator)
         
         base_learning_rate = 0.002
         n_ascent = 5
@@ -179,54 +179,54 @@ elif FLAGS.job_name == "worker":
                                  shape=(n_hidden_1, n_hidden_2),
                                  initializer=tf.contrib.layers.xavier_initializer())
         W3_ascent = tf.get_variable('W3_ascent',
-                                 shape=(n_hidden_2, n_hidden_3),
+                                 shape=(n_hidden_2, 10),
                                  initializer=tf.contrib.layers.xavier_initializer())
-        W4_ascent = tf.get_variable('W4_ascent',
-                                 shape=(n_hidden_3, n_hidden_4),
-                                 initializer=tf.contrib.layers.xavier_initializer())
-        W5_ascent = tf.get_variable('W5_ascent',
-                                 shape=(n_hidden_4, n_hidden_5),
-                                 initializer=tf.contrib.layers.xavier_initializer())
-        W6_ascent = tf.get_variable('W6_ascent',
-                                 shape=(n_hidden_5, 10),
-                                 initializer=tf.contrib.layers.xavier_initializer())
+        # W4_ascent = tf.get_variable('W4_ascent',
+        #                          shape=(n_hidden_3, n_hidden_4),
+        #                          initializer=tf.contrib.layers.xavier_initializer())
+        # W5_ascent = tf.get_variable('W5_ascent',
+        #                          shape=(n_hidden_4, n_hidden_5),
+        #                          initializer=tf.contrib.layers.xavier_initializer())
+        # W6_ascent = tf.get_variable('W6_ascent',
+        #                          shape=(n_hidden_5, 10),
+        #                          initializer=tf.contrib.layers.xavier_initializer())
                                 
         b1_ascent = tf.Variable(tf.zeros([n_hidden_1]))
         b2_ascent = tf.Variable(tf.zeros([n_hidden_2]))
-        b3_ascent = tf.Variable(tf.zeros([n_hidden_3]))
-        b4_ascent = tf.Variable(tf.zeros([n_hidden_4]))
-        b5_ascent = tf.Variable(tf.zeros([n_hidden_5]))
-        b6_ascent = tf.Variable(tf.zeros([10]))
+        b3_ascent = tf.Variable(tf.zeros([10]))
+        # b4_ascent = tf.Variable(tf.zeros([n_hidden_4]))
+        # b5_ascent = tf.Variable(tf.zeros([n_hidden_5]))
+        # b6_ascent = tf.Variable(tf.zeros([10]))
 
         assign_W1_ascent = W1_ascent.assign(W1)
         assign_W2_ascent = W2_ascent.assign(W2)
         assign_W3_ascent = W3_ascent.assign(W3)
-        assign_W4_ascent = W4_ascent.assign(W4)
-        assign_W5_ascent = W5_ascent.assign(W5)
-        assign_W6_ascent = W6_ascent.assign(W6)
+        # assign_W4_ascent = W4_ascent.assign(W4)
+        # assign_W5_ascent = W5_ascent.assign(W5)
+        # assign_W6_ascent = W6_ascent.assign(W6)
         assign_b1_ascent = b1_ascent.assign(b1)
         assign_b2_ascent = b2_ascent.assign(b2)
         assign_b3_ascent = b3_ascent.assign(b3)
-        assign_b4_ascent = b4_ascent.assign(b4)
-        assign_b5_ascent = b5_ascent.assign(b5)
-        assign_b6_ascent = b6_ascent.assign(b6)
+        # assign_b4_ascent = b4_ascent.assign(b4)
+        # assign_b5_ascent = b5_ascent.assign(b5)
+        # assign_b6_ascent = b6_ascent.assign(b6)
 
         z2_ascent = tf.add(tf.matmul(x_ascent, W1_ascent), b1_ascent)
         a2_ascent = tf.nn.sigmoid(z2_ascent)
         z3_ascent = tf.add(tf.matmul(a2_ascent, W2_ascent), b2_ascent)
         a3_ascent = tf.nn.sigmoid(z3_ascent)
-        z4_ascent = tf.add(tf.matmul(a3_ascent, W3_ascent), b3_ascent)
-        a4_ascent = tf.nn.sigmoid(z4_ascent)
-        z5_ascent = tf.add(tf.matmul(a4_ascent, W4_ascent), b4_ascent)
-        a5_ascent = tf.nn.sigmoid(z5_ascent)
-        z6_ascent = tf.add(tf.matmul(a5_ascent, W5_ascent), b5_ascent)
-        a6_ascent = tf.nn.sigmoid(z6_ascent)
-        logits_ascent = tf.add(tf.matmul(a6_ascent, W6_ascent), b6_ascent)
+        # z4_ascent = tf.add(tf.matmul(a3_ascent, W3_ascent), b3_ascent)
+        # a4_ascent = tf.nn.sigmoid(z4_ascent)
+        # z5_ascent = tf.add(tf.matmul(a4_ascent, W4_ascent), b4_ascent)
+        # a5_ascent = tf.nn.sigmoid(z5_ascent)
+        # z6_ascent = tf.add(tf.matmul(a5_ascent, W5_ascent), b5_ascent)
+        # a6_ascent = tf.nn.sigmoid(z6_ascent)
+        logits_ascent = tf.add(tf.matmul(a3_ascent, W3_ascent), b3_ascent)
         dropout_logits_ascent = tf.nn.dropout(logits_ascent, 0.5)
 
         softmax_logits_ascent = tf.nn.softmax(logits_ascent)
 
-        cross_entropy_ascent = tf.nn.softmax_cross_entropy_with_logits(logits=dropout_logits_ascent, labels=y__ascent)
+        cross_entropy_ascent = tf.nn.softmax_cross_entropy_with_logits(logits=logits_ascent, labels=y__ascent)
         loss_ascent = tf.reduce_mean(cross_entropy_ascent)
 
         opt_ascent = tf.train.GradientDescentOptimizer(learning_rate=-base_learning_rate)
@@ -246,54 +246,54 @@ elif FLAGS.job_name == "worker":
                                  shape=(n_hidden_1, n_hidden_2),
                                  initializer=tf.contrib.layers.xavier_initializer())
         W3_descent = tf.get_variable('W3_descent',
-                                 shape=(n_hidden_2, n_hidden_3),
+                                 shape=(n_hidden_2, 10),
                                  initializer=tf.contrib.layers.xavier_initializer())
-        W4_descent = tf.get_variable('W4_descent',
-                                 shape=(n_hidden_3, n_hidden_4),
-                                 initializer=tf.contrib.layers.xavier_initializer())
-        W5_descent = tf.get_variable('W5_descent',
-                                 shape=(n_hidden_4, n_hidden_5),
-                                 initializer=tf.contrib.layers.xavier_initializer())
-        W6_descent = tf.get_variable('W6_descent',
-                                 shape=(n_hidden_5, 10),
-                                 initializer=tf.contrib.layers.xavier_initializer())
+        # W4_descent = tf.get_variable('W4_descent',
+        #                          shape=(n_hidden_3, n_hidden_4),
+        #                          initializer=tf.contrib.layers.xavier_initializer())
+        # W5_descent = tf.get_variable('W5_descent',
+        #                          shape=(n_hidden_4, n_hidden_5),
+        #                          initializer=tf.contrib.layers.xavier_initializer())
+        # W6_descent = tf.get_variable('W6_descent',
+        #                          shape=(n_hidden_5, 10),
+        #                          initializer=tf.contrib.layers.xavier_initializer())
                                 
         b1_descent = tf.Variable(tf.zeros([n_hidden_1]))
         b2_descent = tf.Variable(tf.zeros([n_hidden_2]))
-        b3_descent = tf.Variable(tf.zeros([n_hidden_3]))
-        b4_descent = tf.Variable(tf.zeros([n_hidden_4]))
-        b5_descent = tf.Variable(tf.zeros([n_hidden_5]))
-        b6_descent = tf.Variable(tf.zeros([10]))
+        b3_descent = tf.Variable(tf.zeros([10]))
+        # b4_descent = tf.Variable(tf.zeros([n_hidden_4]))
+        # b5_descent = tf.Variable(tf.zeros([n_hidden_5]))
+        # b6_descent = tf.Variable(tf.zeros([10]))
 
         assign_W1_descent = W1_descent.assign(W1)
         assign_W2_descent = W2_descent.assign(W2)
         assign_W3_descent = W3_descent.assign(W3)
-        assign_W4_descent = W4_descent.assign(W4)
-        assign_W5_descent = W5_descent.assign(W5)
-        assign_W6_descent = W6_descent.assign(W6)
+        # assign_W4_descent = W4_descent.assign(W4)
+        # assign_W5_descent = W5_descent.assign(W5)
+        # assign_W6_descent = W6_descent.assign(W6)
         assign_b1_descent = b1_descent.assign(b1)
         assign_b2_descent = b2_descent.assign(b2)
         assign_b3_descent = b3_descent.assign(b3)
-        assign_b4_descent = b4_descent.assign(b4)
-        assign_b5_descent = b5_descent.assign(b5)
-        assign_b6_descent = b6_descent.assign(b6)
+        # assign_b4_descent = b4_descent.assign(b4)
+        # assign_b5_descent = b5_descent.assign(b5)
+        # assign_b6_descent = b6_descent.assign(b6)
 
         z2_descent = tf.add(tf.matmul(x_descent, W1_descent), b1_descent)
         a2_descent = tf.nn.sigmoid(z2_descent)
         z3_descent = tf.add(tf.matmul(a2_descent, W2_descent), b2_descent)
         a3_descent = tf.nn.sigmoid(z3_descent)
-        z4_descent = tf.add(tf.matmul(a3_descent, W3_descent), b3_descent)
-        a4_descent = tf.nn.sigmoid(z4_descent)
-        z5_descent = tf.add(tf.matmul(a4_descent, W4_descent), b4_descent)
-        a5_descent = tf.nn.sigmoid(z5_descent)
-        z6_descent = tf.add(tf.matmul(a5_descent, W5_descent), b5_descent)
-        a6_descent = tf.nn.sigmoid(z6_descent)
-        logits_descent = tf.add(tf.matmul(a6_descent, W6_descent), b6_descent)
+        # z4_descent = tf.add(tf.matmul(a3_descent, W3_descent), b3_descent)
+        # a4_descent = tf.nn.sigmoid(z4_descent)
+        # z5_descent = tf.add(tf.matmul(a4_descent, W4_descent), b4_descent)
+        # a5_descent = tf.nn.sigmoid(z5_descent)
+        # z6_descent = tf.add(tf.matmul(a5_descent, W5_descent), b5_descent)
+        # a6_descent = tf.nn.sigmoid(z6_descent)
+        logits_descent = tf.add(tf.matmul(a3_descent, W3_descent), b3_descent)
         dropout_logits_descent = tf.nn.dropout(logits_descent, 0.5)
 
         softmax_logits_descent = tf.nn.softmax(logits_descent)
 
-        cross_entropy_descent = tf.nn.softmax_cross_entropy_with_logits(logits=dropout_logits_descent, labels=y__descent)
+        cross_entropy_descent = tf.nn.softmax_cross_entropy_with_logits(logits=logits_descent, labels=y__descent)
         loss_descent = tf.reduce_mean(cross_entropy_descent)
 
         opt_descent = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
@@ -344,7 +344,7 @@ elif FLAGS.job_name == "worker":
                     count = 0
                 
                 # Updates learning rate with SALR algorithm
-                if FLAGS.use_salr and FLAGS.task_index == 0:
+                if FLAGS.use_salr and count % 2 == 0:
                     sess.run(assign_W1_ascent)
                     sess.run(assign_b1_ascent)
                     sess.run(assign_W1_descent)
@@ -357,14 +357,14 @@ elif FLAGS.job_name == "worker":
                     sess.run(assign_b3_ascent)
                     sess.run(assign_W3_descent)
                     sess.run(assign_b3_descent)
-                    sess.run(assign_W4_ascent)
-                    sess.run(assign_b4_ascent)
-                    sess.run(assign_W4_descent)
-                    sess.run(assign_b4_descent)
-                    sess.run(assign_W5_ascent)
-                    sess.run(assign_b5_ascent)
-                    sess.run(assign_W5_descent)
-                    sess.run(assign_b5_descent)
+                    # sess.run(assign_W4_ascent)
+                    # sess.run(assign_b4_ascent)
+                    # sess.run(assign_W4_descent)
+                    # sess.run(assign_b4_descent)
+                    # sess.run(assign_W5_ascent)
+                    # sess.run(assign_b5_ascent)
+                    # sess.run(assign_W5_descent)
+                    # sess.run(assign_b5_descent)
                     
                     for i in range(n_ascent):
                         sess.run(train_op_ascent, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
