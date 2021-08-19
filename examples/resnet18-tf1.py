@@ -63,7 +63,7 @@ server = tf.train.Server(cluster, job_name=FLAGS.job_name, task_index=FLAGS.task
 
 
 def ResNet18(num_classes):
-        inputs = keras.Input(shape=(None,32,32,3))
+        inputs = keras.Input(shape=(32,32,3))
         out = Conv2D(64, (7, 7), strides=2,
                              padding="same", kernel_initializer="he_normal")(inputs)
         #out = BatchNormalization()(out)
