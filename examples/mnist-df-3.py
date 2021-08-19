@@ -309,5 +309,6 @@ elif FLAGS.job_name == "worker":
             print("Test-Accuracy: %2.2f" % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}) *100))
             print("Total Time: %3.2fs" % float(time.time() - begin_time))
             print("Final Cost: %.4f" % cost)
-
+        else:
+            sv.wait_for_stop()
     
