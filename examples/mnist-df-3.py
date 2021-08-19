@@ -181,13 +181,13 @@ elif FLAGS.job_name == "worker":
         W3_ascent = tf.get_variable('W3_ascent',
                                  shape=(n_hidden_2, n_hidden_3),
                                  initializer=tf.contrib.layers.xavier_initializer())
-        W4_ascent = tf.get_variable('W1_ascent',
+        W4_ascent = tf.get_variable('W4_ascent',
                                  shape=(n_hidden_3, n_hidden_4),
                                  initializer=tf.contrib.layers.xavier_initializer())
-        W5_ascent = tf.get_variable('W2_ascent',
+        W5_ascent = tf.get_variable('W5_ascent',
                                  shape=(n_hidden_4, n_hidden_5),
                                  initializer=tf.contrib.layers.xavier_initializer())
-        W6_ascent = tf.get_variable('W3_ascent',
+        W6_ascent = tf.get_variable('W6_ascent',
                                  shape=(n_hidden_5, 10),
                                  initializer=tf.contrib.layers.xavier_initializer())
                                 
@@ -248,13 +248,13 @@ elif FLAGS.job_name == "worker":
         W3_descent = tf.get_variable('W3_descent',
                                  shape=(n_hidden_2, n_hidden_3),
                                  initializer=tf.contrib.layers.xavier_initializer())
-        W4_descent = tf.get_variable('W1_descent',
+        W4_descent = tf.get_variable('W4_descent',
                                  shape=(n_hidden_3, n_hidden_4),
                                  initializer=tf.contrib.layers.xavier_initializer())
-        W5_descent = tf.get_variable('W2_descent',
+        W5_descent = tf.get_variable('W5_descent',
                                  shape=(n_hidden_4, n_hidden_5),
                                  initializer=tf.contrib.layers.xavier_initializer())
-        W6_descent = tf.get_variable('W3_descent',
+        W6_descent = tf.get_variable('W6_descent',
                                  shape=(n_hidden_5, 10),
                                  initializer=tf.contrib.layers.xavier_initializer())
                                 
