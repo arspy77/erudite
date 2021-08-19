@@ -62,72 +62,83 @@ cluster = tf.train.ClusterSpec({"ps": ps_hosts, "worker": worker_hosts})
 server = tf.train.Server(cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
 
 
-class ResnetBlock(Model):
-    """
-    A standard resnet block.
-    """
-
-    def __init__(self, channels: int, down_sample=False):
-        """
-        channels: same as number of convolution kernels
-        """
-        super().__init__()
-
-        self.__channels = channels
-        self.__down_sample = down_sample
-        self.__strides = [2, 1] if down_sample else [1, 1]
-
-        KERNEL_SIZE = (3, 3)
-        # use He initialization, instead of Xavier (a.k.a 'glorot_uniform' in Keras), as suggested in [2]
-        INIT_SCHEME = "he_normal"
-
-        self.conv_1 = Conv2D(self.__channels, strides=self.__strides[0],
-                             kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME)
-        #self.bn_1 = BatchNormalization()
-        self.conv_2 = Conv2D(self.__channels, strides=self.__strides[1],
-                             kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME)
-        #self.bn_2 = BatchNormalization()
-        self.merge = Add()
-
-        if self.__down_sample:
-            # perform down sampling using stride of 2, according to [1].
-            self.res_conv = Conv2D(
-                self.__channels, strides=2, kernel_size=(1, 1), kernel_initializer=INIT_SCHEME, padding="same")
-            #self.res_bn = BatchNormalization()
-
-    def call(self, inputs):
-        res = inputs
-
-        x = self.conv_1(inputs)
-        #x = self.bn_1(x)
-        x = tf.nn.relu(x)
-        x = self.conv_2(x)
-        #x = self.bn_2(x)
-
-        if self.__down_sample:
-            res = self.res_conv(res)
-            #res = self.res_bn(res)
-
-        # if not perform down sample, then add a shortcut directly
-        x = self.merge([x, res])
-        out = tf.nn.relu(x)
-        return out
-
-
 def ResNet18(num_classes):
         inputs = keras.Input(shape=(32,32,3))
         out = Conv2D(64, (7, 7), strides=2,
                              padding="same", kernel_initializer="he_normal")(inputs)
         #out = BatchNormalization()(out)
         out = MaxPool2D(pool_size=(2, 2), strides=2, padding="same")(out)
-        out = ResnetBlock(64)(out)
-        out = ResnetBlock(64)(out)
-        out = ResnetBlock(128, down_sample=True)(out)
-        out = ResnetBlock(128)(out)
-        out = ResnetBlock(256, down_sample=True)(out)
-        out = ResnetBlock(256)(out)
-        out = ResnetBlock(512, down_sample=True)(out)
-        out = ResnetBlock(512)(out)
+        ## out = ResnetBlock(64)(out) x 2
+        for i in range(2):
+            res = out
+            x = Conv2D(64, strides=1,
+                             kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(out)
+            x = tf.nn.relu(x)
+            x = Conv2D(64, strides=1,
+                             kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(x)
+            x = Add()([x, res])
+            out = tf.nn.relu(x)
+        
+        # out = ResnetBlock(128, down_sample=True)(out)
+        res = out
+        x = Conv2D(128, strides=2,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(out)
+        x = tf.nn.relu(x)
+        x = Conv2D(128, strides=1,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(x)
+        res = Conv2D(
+                128, strides=2, kernel_size=(1, 1), kernel_initializer="he_normal", padding="same")(res)
+        x = Add()([x, res])
+        out = tf.nn.relu(x)
+        # out = ResnetBlock(128)(out)
+        res = out
+        x = Conv2D(128, strides=1,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(out)
+        x = tf.nn.relu(x)
+        x = Conv2D(128, strides=1,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(x)
+        x = Add()([x, res])
+        out = tf.nn.relu(x)
+        # out = ResnetBlock(256, down_sample=True)(out)
+        res = out
+        x = Conv2D(256, strides=2,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(out)
+        x = tf.nn.relu(x)
+        x = Conv2D(256, strides=1,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(x)
+        res = Conv2D(
+                256, strides=2, kernel_size=(1, 1), kernel_initializer="he_normal", padding="same")(res)
+        x = Add()([x, res])
+        out = tf.nn.relu(x)
+        # out = ResnetBlock(256)(out)
+        res = out
+        x = Conv2D(256, strides=1,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(out)
+        x = tf.nn.relu(x)
+        x = Conv2D(256, strides=1,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(x)
+        x = Add()([x, res])
+        out = tf.nn.relu(x)
+        # out = ResnetBlock(512, down_sample=True)(out)
+        res = out
+        x = Conv2D(512, strides=2,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(out)
+        x = tf.nn.relu(x)
+        x = Conv2D(512, strides=1,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(x)
+        res = Conv2D(
+                512, strides=2, kernel_size=(1, 1), kernel_initializer="he_normal", padding="same")(res)
+        x = Add()([x, res])
+        out = tf.nn.relu(x)
+        # out = ResnetBlock(512)(out)
+        res = out
+        x = Conv2D(512, strides=1,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(out)
+        x = tf.nn.relu(x)
+        x = Conv2D(512, strides=1,
+                            kernel_size=(3, 3), padding="same", kernel_initializer="he_normal")(x)
+        x = Add()([x, res])
+        out = tf.nn.relu(x)
         out = GlobalAveragePooling2D()(out)
         out = Flatten()(out)
         outputs = Dense(num_classes, activation="softmax")(out)
