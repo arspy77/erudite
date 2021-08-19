@@ -83,10 +83,10 @@ class ResnetBlock(Model):
 
         self.conv_1 = Conv2D(self.__channels, strides=self.__strides[0],
                              kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME)
-        #self.bn_1 = BatchNormalization()
+        self.bn_1 = BatchNormalization()
         self.conv_2 = Conv2D(self.__channels, strides=self.__strides[1],
                              kernel_size=KERNEL_SIZE, padding="same", kernel_initializer=INIT_SCHEME)
-        #self.bn_2 = BatchNormalization()
+        self.bn_2 = BatchNormalization()
         self.merge = Add()
 
         if self.__down_sample:
@@ -118,7 +118,7 @@ def ResNet18(num_classes):
         inputs = keras.Input(shape=(32,32,3))
         out = Conv2D(64, (7, 7), strides=2,
                              padding="same", kernel_initializer="he_normal")(inputs)
-        #out = BatchNormalization()(out)
+        out = BatchNormalization()(out)
         out = MaxPool2D(pool_size=(2, 2), strides=2, padding="same")(out)
         out = ResnetBlock(64)(out)
         out = ResnetBlock(64)(out)
