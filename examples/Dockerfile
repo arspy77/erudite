@@ -4,6 +4,6 @@ RUN pip install sklearn
 
 RUN pip install keras==2.3.1
 
-RUN apt update
+RUN apt-get update -y
 
-RUN apt install curl
+RUN apt-get install curl -y
