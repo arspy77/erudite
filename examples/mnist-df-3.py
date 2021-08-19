@@ -289,13 +289,13 @@ elif FLAGS.job_name == "worker":
                     sess.run(assign_W3_descent)
                     sess.run(assign_b3_descent)
                     
-                    descent_loss = 0
-                    ascent_loss = 0
-                    
                     for i in range(n_ascent):
-                        descent_loss = sess.run(train_op_ascent, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
+                        sess.run(train_op_ascent, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
                     for i in range(n_descent):
-                        ascent_loss = sess.run(train_op_descent, feed_dict={x_descent: batch_x, y__descent: batch_y})
+                        sess.run(train_op_descent, feed_dict={x_descent: batch_x, y__descent: batch_y})
+
+                    descent_loss = sess.run(ascent_loss, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
+                    ascent_loss = sess.run(descent_loss, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
                         
                     stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
                     print("asc loss : %3.10f" % ascent_loss)
