@@ -247,10 +247,11 @@ elif FLAGS.job_name == "worker":
 
         # perform training cycles
         start_time = time.time()
-        for epoch in range(training_epochs):
+        step = 0
+        batch_count = int(mnist.train.num_examples / batch_size)
+        total_step = training_epochs*batch_count
+        while step < total_step:
 
-            # number of batches in one epoch
-            batch_count = int(mnist.train.num_examples / batch_size)
 
 
             count = 0
@@ -261,6 +262,7 @@ elif FLAGS.job_name == "worker":
                 _, cost, summary, step, train_accuracy = sess.run([train_op, loss, summary_op, global_step, accuracy],
                     feed_dict={x: batch_x, y_: batch_y})
                 writer.add_summary(summary, step)
+                print(sess.run(learning_rate))
 
                 count += 1
                 if count % frequency == 0 or i + 1 == batch_count:
@@ -269,7 +271,8 @@ elif FLAGS.job_name == "worker":
                     print("Step: %d," % (step + 1), " Epoch: %2d," % (epoch + 1),
                           " Batch: %3d of %3d," % (i + 1, batch_count), " Cost: %.4f," % cost,
                           " Train acc %2.2f" % (train_accuracy * 100),
-                          " AvgTime: %3.2fms" % float(elapsed_time * 1000 / frequency))
+                          " AvgTime: %3.2fms" % float(elapsed_time * 1000 / frequency),
+                          " Learning Rate: %3.10f " % sess.run(learning_rate))
                     count = 0
                 
                 # Updates learning rate with SALR algorithm
@@ -296,18 +299,12 @@ elif FLAGS.job_name == "worker":
                     descent_loss = sess.run(loss_descent, feed_dict={x_descent: batch_x, y__descent: batch_y})
                         
                     stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
-                    print("asc loss : %3.10f" % ascent_loss)
-                    print("desc loss : %3.10f" % descent_loss)
-                    print(stochastic_sharpness)
-                    print("^ss msv")
+                    print("stochastic sharpness: %3.10f" % stochastic_sharpness)
                     stochastic_sharpness_list =  np.append(stochastic_sharpness_list, stochastic_sharpness)
 
                     median_sharpness = np.median(stochastic_sharpness_list)
-                    print(median_sharpness)
-                    sess.run(update_learning_rate_multiplicator, feed_dict={new_learning_rate_multiplicator: stochastic_sharpness / median_sharpness})
-                
-                current_learning_rate_multiplicator = sess.run(learning_rate_multiplicator)
-                sess.run(update_learning_rate, feed_dict={new_learning_rate: (current_learning_rate_multiplicator * initial_learning_rate)})
+                    print("median sharpness: %3.10f" % median_sharpness)
+                    sess.run(update_learning_rate_multiplicator, feed_dict={new_learning_rate: stochastic_sharpness / median_sharpness * initial_learning_rate})
 
         print("Test-Accuracy: %2.2f" % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}) *100))
         print("Total Time: %3.2fs" % float(time.time() - begin_time))
