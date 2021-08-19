@@ -114,44 +114,25 @@ class ResnetBlock(Model):
         return out
 
 
-class ResNet18(Model):
-
-    def __init__(self, num_classes, **kwargs):
-        """
-            num_classes: number of classes in specific classification task.
-        """
-        super().__init__(**kwargs)
-        self.conv_1 = Conv2D(64, (7, 7), strides=2,
-                             padding="same", kernel_initializer="he_normal")
-        self.init_bn = BatchNormalization()
-        self.pool_2 = MaxPool2D(pool_size=(2, 2), strides=2, padding="same")
-        self.res_1_1 = ResnetBlock(64)
-        self.res_1_2 = ResnetBlock(64)
-        self.res_2_1 = ResnetBlock(128, down_sample=True)
-        self.res_2_2 = ResnetBlock(128)
-        self.res_3_1 = ResnetBlock(256, down_sample=True)
-        self.res_3_2 = ResnetBlock(256)
-        self.res_4_1 = ResnetBlock(512, down_sample=True)
-        self.res_4_2 = ResnetBlock(512)
-        self.avg_pool = GlobalAveragePooling2D()
-        self.flat = Flatten()
-        self.fc = Dense(num_classes, activation="softmax")
-    
-    # def build(self, input_shape):
-    #     self.fc(self.flat(self.avg_pool(self.res_4_2(self.res_4_1(self.res_3_2(self.res_3_1(self.res_2_2(self.res_2_1(self.res_1_2(
-    #         self.res_1_1(self.pool_2(self.init_bn(self.conv_1(keras.Input(shape=input_shape, name="input_x")))))))))))))))
-
-    def call(self, inputs):
-        out = self.conv_1(inputs)
-        out = self.init_bn(out)
-        out = tf.nn.relu(out)
-        out = self.pool_2(out)
-        for res_block in [self.res_1_1, self.res_1_2, self.res_2_1, self.res_2_2, self.res_3_1, self.res_3_2, self.res_4_1, self.res_4_2]:
-            out = res_block(out)
-        out = self.avg_pool(out)
-        out = self.flat(out)
-        out = self.fc(out)
-        return out
+def ResNet18(num_classes):
+        inputs = keras.Input(shape=(32,32,3))
+        out = Conv2D(64, (7, 7), strides=2,
+                             padding="same", kernel_initializer="he_normal")(inputs)
+        out = BatchNormalization()(out)
+        out = MaxPool2D(pool_size=(2, 2), strides=2, padding="same")(out)
+        out = ResnetBlock(64)(out)
+        out = ResnetBlock(64)(out)
+        out = ResnetBlock(128, down_sample=True)(out)
+        out = ResnetBlock(128)(out)
+        out = ResnetBlock(256, down_sample=True)(out)
+        out = ResnetBlock(256)(out)
+        out = ResnetBlock(512, down_sample=True)(out)
+        out = ResnetBlock(512)(out)
+        out = GlobalAveragePooling2D()(out)
+        out = Flatten()(out)
+        outputs = Dense(num_classes, activation="softmax")(out)
+        model = Model(inputs=inputs, outputs=outputs)
+        return model
 
 
 
@@ -197,19 +178,19 @@ elif FLAGS.job_name == "worker":
 
         targets = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
         
-        predictions = model.fc.output
+        predictions = model.output
         loss = tf.reduce_mean(
             keras.losses.categorical_crossentropy(targets, predictions))
 
         targets_ascent = tf.placeholder(tf.float32, shape=[None, 10], name="y-input_ascent")
         
-        predictions_ascent = model_ascent.fc.output
+        predictions_ascent = model_ascent.output
         loss_ascent = tf.reduce_mean(
             keras.losses.categorical_crossentropy(targets_ascent, predictions_ascent))
 
         targets_descent = tf.placeholder(tf.float32, shape=[None, 10], name="y-input_descent")
         
-        predictions_descent = model_descent.fc.output
+        predictions_descent = model_descent.output
         loss_descent = tf.reduce_mean(
             keras.losses.categorical_crossentropy(targets_descent, predictions_descent))
 
