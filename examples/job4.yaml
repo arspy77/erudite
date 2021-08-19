@@ -16,11 +16,11 @@ spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/resnet18-tf1.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-3.py | python3 -'
             command:
             - /bin/bash
             - -c
-            image: gcr.io/large-batch-training/keras-container
+            image: tensorflow/tensorflow:1.15.0-py3
             name: tensorflow
             ports:
             - containerPort: 2222
@@ -33,7 +33,7 @@ spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/resnet18-tf1.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-3.py | python3 -'
             env:
             - name: global_steps
               value: "100000"
@@ -42,7 +42,7 @@ spec:
             command:
             - /bin/bash
             - -c
-            image: gcr.io/large-batch-training/keras-container
+            image: tensorflow/tensorflow:1.15.0-py3
             name: tensorflow
             ports:
             - containerPort: 2222

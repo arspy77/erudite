@@ -53,7 +53,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
 # config
-batch_size = mnist.train.num_examples // 3
+batch_size = 100
 initial_learning_rate = 0.01 
 training_epochs = 50
 n_hidden_1 = 1000
@@ -70,37 +70,6 @@ elif FLAGS.job_name == "worker":
 
         # count the number of updates
         global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(0), trainable=False)
-
-
-        ########################################## START MNISTFC ##########################################
-        # learning_rate = tf.placeholder(tf.float32, shape=[],
-        #                                     name='learning_rate')
-
-        # X = tf.placeholder(tf.float32,
-        #                         shape=[None, 784],
-        #                         name='input_image_vector')
-        
-        # onehot_labels = tf.placeholder(tf.float32,
-        #                                     shape=[None,10],
-        #                                     name='output_layer')
-
-        # layer_1_FC = tf.contrib.layers.fully_connected(X, 100)
-        # layer_2_FC = tf.contrib.layers.fully_connected(layer_1_FC, 30)
-        # #This gives the logits
-        # layer_3_FC = tf.contrib.layers.fully_connected(layer_2_FC, 10)
-
-        # loss_function = tf.nn.softmax_cross_entropy_with_logits(
-        #     logits=layer_3_FC, labels=onehot_labels)
-
-        # loss = tf.reduce_mean(loss_function)
-        # optimizer = tf.train.GradientDescentOptimizer(
-        #     learning_rate)
-        # self.optimization = optimizer.minimize(loss)
-        # top_1_correct = tf.equal(tf.argmax(layer_3_FC, 1),
-        #                          tf.argmax(onehot_labels, 1))
-        # accuracy = tf.reduce_mean(tf.cast(top_1_correct, tf.float32))
-
-        ##########################################  END MNISTFC  ##########################################
 
         with tf.name_scope('input'):
             # None -> batch size can be any size, 784 -> flattened mnist image
@@ -320,15 +289,13 @@ elif FLAGS.job_name == "worker":
                     sess.run(assign_W3_descent)
                     sess.run(assign_b3_descent)
                     
-                    for i in range(n_ascent):
-                        sess.run(train_op_ascent, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
-                    for i in range(n_descent):
-                        sess.run(train_op_descent, feed_dict={x_descent: batch_x, y__descent: batch_y})
-                    
                     descent_loss = 0
                     ascent_loss = 0
-                    descent_loss = sess.run(descent_loss_op, feed_dict={x_descent: batch_x, y__descent: batch_y})
-                    ascent_loss = sess.run(ascent_loss_op, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
+                    
+                    for i in range(n_ascent):
+                        descent_loss = sess.run(train_op_ascent, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
+                    for i in range(n_descent):
+                        ascent_loss = sess.run(train_op_descent, feed_dict={x_descent: batch_x, y__descent: batch_y})
                         
                     stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
                     print("asc loss : %3.10f" % ascent_loss)
