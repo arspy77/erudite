@@ -298,11 +298,11 @@ elif FLAGS.job_name == "worker":
                     descent_loss = sess.run(loss_descent, feed_dict={x_descent: batch_x, y__descent: batch_y})
                         
                     stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
-                    print("stochastic sharpness: %3.10f" % stochastic_sharpness)
+                    #print("stochastic sharpness: %3.10f" % stochastic_sharpness)
                     stochastic_sharpness_list =  np.append(stochastic_sharpness_list, stochastic_sharpness)
 
                     median_sharpness = np.median(stochastic_sharpness_list)
-                    print("median sharpness: %3.10f" % median_sharpness)
+                   # print("median sharpness: %3.10f" % median_sharpness)
                     sess.run(update_learning_rate, feed_dict={new_learning_rate: stochastic_sharpness / median_sharpness * initial_learning_rate})
        
         if (FLAGS.task_index == 0):
