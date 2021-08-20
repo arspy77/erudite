@@ -397,7 +397,8 @@ elif FLAGS.job_name == "worker":
                     total_median_sharpness = np.median(current_median_sharpness_list)
 
                    # print("median sharpness: %3.10f" % median_sharpness)
-                    sess.run(update_learning_rate, feed_dict={new_learning_rate: stochastic_sharpness / total_median_sharpness * initial_learning_rate})
+                    if total_median_sharpness != 0:
+                        sess.run(update_learning_rate, feed_dict={new_learning_rate: stochastic_sharpness / total_median_sharpness * initial_learning_rate})
        
         if (FLAGS.task_index == 0):
             print("Test-Accuracy: %2.10f" % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}) *100))
