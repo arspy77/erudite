@@ -1,7 +1,7 @@
 apiVersion: kubeflow.org/v1
 kind: TFJob
 metadata:
-  name: epoch_150_SALR_job
+  name: epoch-100-non-SALR-job
 spec:
   max-instances: 3
   min-instances: 3
@@ -36,9 +36,9 @@ spec:
             - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-3.py | python3 -'
             env:
             - name: epoch
-              value: "150"
+              value: "100"
             - name: use_salr
-              value: "True"
+              value: "False"
             command:
             - /bin/bash
             - -c

@@ -1,7 +1,7 @@
 apiVersion: kubeflow.org/v1
 kind: TFJob
 metadata:
-  name: epoch_150_non-SALR_job
+  name: epoch-150-SALR-job
 spec:
   max-instances: 3
   min-instances: 3
@@ -38,7 +38,7 @@ spec:
             - name: epoch
               value: "150"
             - name: use_salr
-              value: "False"
+              value: "True"
             command:
             - /bin/bash
             - -c
