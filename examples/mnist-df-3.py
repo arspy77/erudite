@@ -38,6 +38,7 @@ FLAGS.ps_hosts = ",".join(TF_CONFIG["cluster"]["ps"])
 FLAGS.worker_hosts = ",".join(TF_CONFIG["cluster"]["worker"])
 
 FLAGS.use_salr = (True if os.environ["use_salr"] == "True" else False) if "use_salr" in os.environ else True
+FLAGS.epoch = int(os.environ["epoch"]) if "epoch" in os.environ else 100
 
 ps_hosts = FLAGS.ps_hosts.split(",")
 worker_hosts = FLAGS.worker_hosts.split(",")
@@ -55,7 +56,7 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 # config
 batch_size = 100
 initial_learning_rate = 0.01 
-training_epochs = 200
+training_epochs = FLAGS.epoch
 n_hidden_1 = 200
 n_hidden_2 = 80
 # n_hidden_3 = 1000
@@ -344,9 +345,9 @@ elif FLAGS.job_name == "worker":
                     elapsed_time = time.time() - start_time
                     start_time = time.time()
                     print("Step: %d," % (step + 1), " Epoch: %2d," % (step//batch_count + 1),
-                          " Batch: %3d of %3d," % (i + 1, batch_count), " Cost: %.4f," % cost,
+                          #" Batch: %3d of %3d," % (i + 1, batch_count), " Cost: %.4f," % cost,
                           " Train acc %2.2f" % (train_accuracy * 100),
-                          " AvgTime: %3.2fms" % float(elapsed_time * 1000 / frequency),
+                          #" AvgTime: %3.2fms" % float(elapsed_time * 1000 / frequency),
                           " Learning Rate: %3.10f " % sess.run(learning_rate))
                     count = 0
                 
@@ -402,8 +403,8 @@ elif FLAGS.job_name == "worker":
        
         if (FLAGS.task_index == 0):
             print("Test-Accuracy: %2.10f" % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}) *100))
-            print("Total Time: %3.10fs" % float(time.time() - begin_time))
-            print("Final Cost: %.10f" % cost)
+            #print("Total Time: %3.10fs" % float(time.time() - begin_time))
+            #print("Final Cost: %.10f" % cost)
         else:
             sv.wait_for_stop()
     
