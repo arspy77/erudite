@@ -65,3 +65,5 @@ spec:
   - name: dragon-tf-operator
     image: salrtraining.azurecr.io/dragon-weighted-autoscaling
     command: ["DRAGON", "-alsologtostderr"]
+  imagePullSecrets:
+  - name: <INSERT_SECRET_NAME>
