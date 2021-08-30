@@ -63,5 +63,5 @@ spec:
   restartPolicy: Always
   containers:
   - name: dragon-tf-operator
-    image: salrtraining.azurecr.io/dragon
+    image: salrtraining.azurecr.io/dragon-weighted-autoscaling
     command: ["DRAGON", "-alsologtostderr"]
