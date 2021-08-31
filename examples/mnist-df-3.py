@@ -152,12 +152,12 @@ with tf.device(tf.test.gpu_device_name()):
                 correct_prediction = tf.equal(tf.argmax(softmax_logits, 1), tf.argmax(y_, 1))
                 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-            # create a summary for our cost and accuracy
-            tf.summary.scalar("cost", loss)
-            tf.summary.scalar("accuracy", accuracy)
+            # # create a summary for our cost and accuracy
+            # tf.summary.scalar("cost", loss)
+            # tf.summary.scalar("accuracy", accuracy)
 
-            # merge all summaries into a single "operation" which we can execute in a session
-            summary_op = tf.summary.merge_all()
+            # # merge all summaries into a single "operation" which we can execute in a session
+            # summary_op = tf.summary.merge_all()
 
             ################################################################################################################
             # For SALR algorithm ###########################################################################################
@@ -322,7 +322,7 @@ with tf.device(tf.test.gpu_device_name()):
         stochastic_sharpness_list = np.array([])
         with sv.prepare_or_wait_for_session(server.target) as sess:
             # create log writer object (this will log on every machine)
-            writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
+            # writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
             # perform training cycles
             start_time = time.time()
@@ -338,9 +338,9 @@ with tf.device(tf.test.gpu_device_name()):
                     batch_x, batch_y = mnist.train.next_batch(batch_size)
 
                     # perform the operations we defined earlier on batch
-                    _, cost, summary, step, train_accuracy = sess.run([train_op, loss, summary_op, global_step, accuracy],
+                    _, cost, step, train_accuracy = sess.run([train_op, loss, global_step, accuracy],
                         feed_dict={x: batch_x, y_: batch_y})
-                    writer.add_summary(summary, step)
+                    # writer.add_summary(summary, step)
 
                     count += 1
                     if count % frequency == 0 or i + 1 == batch_count:
