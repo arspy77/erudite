@@ -24,8 +24,10 @@ import numpy as np
 import sys
 import time
 
-print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-with tf.device('/device:GPU:0'):
+if tf.test.gpu_device_name():
+    print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
+
+with tf.device(tf.test.gpu_device_name()):
     class Empty:
         pass
 
