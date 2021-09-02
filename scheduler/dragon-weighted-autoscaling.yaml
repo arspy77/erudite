@@ -63,7 +63,5 @@ spec:
   restartPolicy: Always
   containers:
   - name: dragon-tf-operator
-    image: salrtraining.azurecr.io/dragon-weighted-autoscaling
+    image: gcr.io/large-batch-training/dragon-tf-operator
     command: ["DRAGON", "-alsologtostderr"]
-  imagePullSecrets:
-  - name: <INSERT_SECRET_NAME>

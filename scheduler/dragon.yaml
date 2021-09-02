@@ -63,5 +63,5 @@ spec:
   restartPolicy: Always
   containers:
   - name: dragon-tf-operator
-    image: salrtraining.azurecr.io/dragon
+    image: gcr.io/large-batch-training/dragon-original
     command: ["DRAGON", "-alsologtostderr"]
