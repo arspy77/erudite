@@ -24,10 +24,6 @@ import numpy as np
 import sys
 import time
 
-if tf.test.gpu_device_name():
-    print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
-
-# with tf.device(tf.test.gpu_device_name()):
 class Empty:
     pass
 
