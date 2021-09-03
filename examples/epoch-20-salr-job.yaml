@@ -1,7 +1,7 @@
 apiVersion: kubeflow.org/v1
 kind: TFJob
 metadata:
-  name: epoch-20-non-salr-job
+  name: epoch-20-salr-job
 spec:
   max-instances: 3
   min-instances: 3
