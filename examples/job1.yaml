@@ -3,10 +3,10 @@ kind: TFJob
 metadata:
   name: job1
 spec:
-  max-instances: 1
+  max-instances: 4
   min-instances: 1
   priority: 1
-  cleanPodPolicy: "Running"
+  cleanPodPolicy: "All"
   tfReplicaSpecs:
     PS:
       replicas: 1
@@ -16,7 +16,7 @@ spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-3.py | python3 -'
             command:
             - /bin/bash
             - -c
@@ -26,17 +26,17 @@ spec:
             - containerPort: 2222
               name: tfjob-port
     Worker:
-      replicas: 1
+      replicas: 2
       restartPolicy: OnFailure
       template:
         spec:
           terminationGracePeriodSeconds: 0
           containers:
           - args:
-            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df.py | python3 -'
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-3.py | python3 -'
             env:
-            - name: global_steps
-              value: "100000"
+            - name: epoch
+              value: "20"
             - name: use_salr
               value: "True"
             command:
@@ -49,5 +49,5 @@ spec:
               name: tfjob-port
             resources:
               requests:
-                cpu: "4"
-                memory: "16Gi"
+                cpu: "1"
+                memory: "2Gi"
