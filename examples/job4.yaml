@@ -6,7 +6,7 @@ spec:
   max-instances: 6
   min-instances: 2
   priority: 100
-  cleanPodPolicy: "All"
+  cleanPodPolicy: "Running"
   tfReplicaSpecs:
     PS:
       replicas: 1
