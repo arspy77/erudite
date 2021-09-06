@@ -413,5 +413,4 @@ elif FLAGS.job_name == "worker":
             print("Test-Accuracy: %2.10f" % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}) *100))
             print("Total Time: %3.10fs" % float(time.time() - begin_time))
             #print("Final Cost: %.10f" % cost)
-            sess.close()
     
