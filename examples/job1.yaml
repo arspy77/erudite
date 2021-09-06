@@ -36,7 +36,7 @@ spec:
             - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-3.py | python3 -'
             env:
             - name: epoch
-              value: "20"
+              value: "100"
             - name: use_salr
               value: "True"
             command:
