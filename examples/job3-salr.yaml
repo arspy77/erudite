@@ -1,10 +1,10 @@
 apiVersion: kubeflow.org/v1
 kind: TFJob
 metadata:
-  name: job2
+  name: job3-salr
 spec:
   max-instances: 6
-  min-instances: 2
+  min-instances: 1
   priority: 1
   cleanPodPolicy: "Running"
   tfReplicaSpecs:
