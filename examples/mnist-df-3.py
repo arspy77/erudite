@@ -311,16 +311,22 @@ elif FLAGS.job_name == "worker":
         init_op = tf.initialize_all_variables()
         print("Variables initialized ...")
 
-    sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0), global_step=global_step, init_op=init_op,
-                                config=tf.ConfigProto(
-                                               device_filters=["/job:ps", "/job:worker/task:%d" % FLAGS.task_index]
-                                )
-                            )
-
+    # sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0), global_step=global_step, init_op=init_op,
+    #                             config=tf.ConfigProto(
+    #                                            device_filters=["/job:ps", "/job:worker/task:%d" % FLAGS.task_index]
+    #                             )
+    #                         )
+    
     begin_time = time.time()
     frequency = 100
     stochastic_sharpness_list = np.array([])
-    with sv.prepare_or_wait_for_session(server.target) as sess:
+
+    with tf.train.MonitoredTrainingSession(master=server.target,
+                                           is_chief=(FLAGS.task_index == 0),
+                                           config=tf.ConfigProto(
+                                               device_filters=["/job:ps", "/job:worker/task:%d" % FLAGS.task_index]
+                                                )
+                                           ) as sess:
         # create log writer object (this will log on every machine)
         # writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
@@ -407,7 +413,5 @@ elif FLAGS.job_name == "worker":
             print("Test-Accuracy: %2.10f" % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}) *100))
             print("Total Time: %3.10fs" % float(time.time() - begin_time))
             #print("Final Cost: %.10f" % cost)
-            sv.stop()
-        else:
-            sv.wait_for_stop()
+            sess.reset(server.target)
     
