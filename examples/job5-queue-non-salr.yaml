@@ -1,0 +1,53 @@
+apiVersion: kubeflow.org/v1
+kind: TFJob
+metadata:
+  name: job5-queue-non-salr
+spec:
+  max-instances: 4
+  min-instances: 2
+  priority: 1
+  cleanPodPolicy: "Running"
+  tfReplicaSpecs:
+    PS:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          terminationGracePeriodSeconds: 0
+          containers:
+          - args:
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-3.py | python3 -'
+            command:
+            - /bin/bash
+            - -c
+            image: tensorflow/tensorflow:1.15.0-py3
+            name: tensorflow
+            ports:
+            - containerPort: 2222
+              name: tfjob-port
+    Worker:
+      replicas: 3
+      restartPolicy: OnFailure
+      template:
+        spec:
+          terminationGracePeriodSeconds: 0
+          containers:
+          - args:
+            - 'curl -s https://raw.githubusercontent.com/arspy77/erudite/testing_salr/examples/mnist-df-3.py | python3 -'
+            env:
+            - name: epoch
+              value: "100"
+            - name: use_salr
+              value: "False"
+            command:
+            - /bin/bash
+            - -c
+            image: tensorflow/tensorflow:1.15.0-py3
+            name: tensorflow
+            ports:
+            - containerPort: 2222
+              name: tfjob-port
+            resources:
+              requests:
+                cpu: "2"
+                memory: "4Gi"
