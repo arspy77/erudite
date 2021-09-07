@@ -80,7 +80,7 @@ elif FLAGS.job_name == "worker":
             y_ = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
 
         # model parameters will change during training so we use tf.Variable
-        tf.set_random_seed(1)
+        # tf.set_random_seed(1)
         with tf.name_scope("weights"):
             W1 = tf.get_variable('W1',
                                 shape=(784, n_hidden_1),
