@@ -402,7 +402,7 @@ elif FLAGS.job_name == "worker":
                     ascent_loss = sess.run(loss_ascent, feed_dict={x_ascent: batch_x, y__ascent: batch_y})
                     descent_loss = sess.run(loss_descent, feed_dict={x_descent: batch_x, y__descent: batch_y})
                         
-                    stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
+                    stochastic_sharpness = float(ascent_loss - descent_loss)
                     #print("stochastic sharpness: %3.10f" % stochastic_sharpness)
                     stochastic_sharpness_list =  np.append(stochastic_sharpness_list, stochastic_sharpness)
 
