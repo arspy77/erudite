@@ -62,6 +62,11 @@ n_hidden_2 = 80
 # n_hidden_5 = 1000
 logs_path = "/tmp/mnist/2"
 
+def get_median(v):
+    v = tf.reshape(v, [-1])
+    mid = v.get_shape()[0]//2 + 1
+    return tf.nn.top_k(v, mid).values[-1]
+
 if FLAGS.job_name == "ps":
     server.join()
 elif FLAGS.job_name == "worker":
@@ -162,8 +167,6 @@ elif FLAGS.job_name == "worker":
         # learning_rate_multiplicator = tf.Variable(1.0, trainable=False)
         # new_learning_rate_multiplicator = tf.placeholder(tf.float32, shape=[], name="new_learning_rate_multiplicator")
         # update_learning_rate_multiplicator = tf.assign(learning_rate_multiplicator, new_learning_rate_multiplicator)
-        
-        
         # median_sharpness_list = []
         # new_median_sharpness_list = []
         # update_median_sharpness_list = []
@@ -171,14 +174,14 @@ elif FLAGS.job_name == "worker":
         #     median_sharpness_list.append(tf.Variable(0., trainable=False))
         #     new_median_sharpness_list.append(tf.placeholder(tf.float32, shape=[], name="new_median_sharpness_" + str(i)))
         #     update_median_sharpness_list.append(tf.assign(median_sharpness_list[i], new_median_sharpness_list[i]))
-        
-        mean_sharpness = tf.Variable(0., trainable=False)
-        new_mean_sharpness = tf.placeholder(tf.float32, shape=[], name="new_mean_sharpness")
-        update_mean_sharpness = tf.assign(mean_sharpness, new_mean_sharpness)
 
-        sharpness_count = tf.Variable(0, trainable=False)
-        new_sharpness_count = tf.placeholder(tf.int32, shape=[], name="new_sharpness_count")
-        update_sharpness_count = tf.assign(sharpness_count, new_sharpness_count)
+        sharpness_list = tf.TensorArray(tf.float32, size=0, dynamic_size=True)
+        
+        new_sharpness = tf.placeholder(tf.float32, shape=[], name="new_sharpness")
+        append_sharpness_list = sharpness_list.write(sharpness_list.size(), new_sharpness)
+        
+        median_sharpness = get_median(sharpness_list.stack())
+
 
         base_learning_rate = 0.002
         n_ascent = 5
@@ -328,7 +331,7 @@ elif FLAGS.job_name == "worker":
     
     begin_time = time.time()
     frequency = 100
-    # stochastic_sharpness_list = np.array([])
+    stochastic_sharpness_list = np.array([])
 
     with tf.train.MonitoredTrainingSession(master=server.target,
                                            is_chief=(FLAGS.task_index == 0),
@@ -345,6 +348,8 @@ elif FLAGS.job_name == "worker":
         batch_count = int(mnist.train.num_examples / batch_size)
         total_step = training_epochs*batch_count
         while step < total_step:
+
+
 
             count = 0
             for i in range(batch_count):
@@ -399,18 +404,25 @@ elif FLAGS.job_name == "worker":
                         
                     stochastic_sharpness = float(ascent_loss - descent_loss) / batch_size
                     
-                    current_mean_sharpness = sess.run(mean_sharpness)
-                    current_sharpness_count = sess.run(sharpness_count)
+                    sess.run(append_sharpness_list, feed_dict={new_sharpness:stochastic_sharpness})
+                    median = sess.run(median_sharpness) 
+                    #print("stochastic sharpness: %3.10f" % stochastic_sharpness)
+                    # stochastic_sharpness_list =  np.append(stochastic_sharpness_list, stochastic_sharpness)
 
+                    # median_sharpness = np.median(stochastic_sharpness_list)
                     
-                    current_mean_sharpness = (current_mean_sharpness*current_sharpness_count + stochastic_sharpness) / (current_sharpness_count + 1)
-                    current_sharpness_count = current_sharpness_count + 1
+                    # current_median_sharpness_list = np.array([median_sharpness])
+                    # for i in range(len(worker_hosts)):
+                    #     if i == FLAGS.task_index:
+                    #         sess.run(update_median_sharpness_list[i], feed_dict={new_median_sharpness_list[i]: median_sharpness})
+                    #     else:
+                    #         np.append(current_median_sharpness_list, sess.run(median_sharpness_list[i]))
+                    
+                    # total_median_sharpness = np.median(current_median_sharpness_list)
 
-                    sess.run(update_mean_sharpness, feed_dict={new_mean_sharpness: current_mean_sharpness})
-                    sess.run(update_sharpness_count, feed_dict={new_sharpness_count: current_sharpness_count})
-
-                    if current_mean_sharpness != 0:
-                        sess.run(update_learning_rate, feed_dict={new_learning_rate: stochastic_sharpness / current_mean_sharpness * initial_learning_rate})
+                # print("median sharpness: %3.10f" % median_sharpness)
+                    if median != 0:
+                        sess.run(update_learning_rate, feed_dict={new_learning_rate: stochastic_sharpness / median * initial_learning_rate})
     
         if (FLAGS.task_index == 0):
             print("Test-Accuracy: %2.10f" % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}) *100))
