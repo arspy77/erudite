@@ -44,7 +44,7 @@ metadata:
     scheduler.alpha.kubernetes.io/critical-pod: ""
   labels:
     app: dragon-tf-operator
-spec: 
+spec:
   serviceAccountName: dragon-tf-operator
   priorityClassName: system-node-critical
   tolerations:
@@ -59,9 +59,10 @@ spec:
         nodeSelectorTerms:
         - matchExpressions:
           - key: "node-role.kubernetes.io/master"
-            operator: Exists
+            operator: "Exists"
   restartPolicy: Always
   containers:
   - name: dragon-tf-operator
-    image: gcr.io/large-batch-training/dragon-original
+    image: ncy9371/dragon:20200229152327
     command: ["DRAGON", "-alsologtostderr"]
+
