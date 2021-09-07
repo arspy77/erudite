@@ -1,7 +1,7 @@
 apiVersion: kubeflow.org/v1
 kind: TFJob
 metadata:
-  name: job1-non-salr
+  name: job1-salr
 spec:
   max-instances: 4
   min-instances: 1
