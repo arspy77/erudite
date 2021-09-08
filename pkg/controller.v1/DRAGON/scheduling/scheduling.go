@@ -833,6 +833,7 @@ func ScaleUp(runningQueue JobQueue, constNodeRes cluster.NodeResources) (can boo
 	nodeRes := constNodeRes.DeepCopy()
 	scaleUpTarget = make(JobsPlacementPlan)
 
+	can = false
 	i := 0
 	runningJobsNum := len(runningQueue)
 	for nodeName, node := range *nodeRes {
@@ -929,6 +930,9 @@ func ScaleUp(runningQueue JobQueue, constNodeRes cluster.NodeResources) (can boo
 			if stop {
 				break
 			}
+		}
+		if can {
+			break
 		}
 	}
 
