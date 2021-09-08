@@ -4,7 +4,7 @@ metadata:
   name: job5-queue-non-salr
 spec:
   max-instances: 4
-  min-instances: 2
+  min-instances: 3
   priority: 1
   cleanPodPolicy: "Running"
   tfReplicaSpecs:
