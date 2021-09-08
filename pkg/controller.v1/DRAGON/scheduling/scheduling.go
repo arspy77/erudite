@@ -931,9 +931,6 @@ func ScaleUp(runningQueue JobQueue, constNodeRes cluster.NodeResources) (can boo
 				break
 			}
 		}
-		if can {
-			break
-		}
 	}
 
 	return
