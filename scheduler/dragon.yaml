@@ -63,5 +63,5 @@ spec:
   restartPolicy: Always
   containers:
   - name: dragon-tf-operator
-    image: gcr.io/large-batch-training/dragon-original
+    image: gcr.io/large-batch-training/dragon-original@sha256:0bb598c85645aec13053ea642d5869fe1845724e9aad8fc1267bf960e586808f
     command: ["DRAGON", "-alsologtostderr"]
